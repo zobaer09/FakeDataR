@@ -1,0 +1,30 @@
+template:
+  bootstrap: 5
+
+navbar:
+  structure:
+    left:  [reference, articles]
+    right: [search, github]
+  components:
+    github:
+      icon: fab fa-github
+      href: https://github.com/<yourname>/FakeDataR
+
+reference:
+  - title: "Generate"
+    contents:
+      - generate_fake_data
+      - generate_fake_with_privacy
+  - title: "Utilities"
+    contents:
+      - validate_fake
+      - export_fake
+      - prepare_input_data
+      - llm_bundle
+
+development:
+  mode: auto
+
+# Avoid re-install in a new R process on Windows
+new_process: false
+
