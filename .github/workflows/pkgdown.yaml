@@ -1,0 +1,36 @@
+name: pkgdown
+
+on:
+  push:
+    branches: [ master ]
+    paths:
+      - 'R/**'
+      - 'man/**'
+      - 'DESCRIPTION'
+      - 'NAMESPACE'
+      - 'vignettes/**'
+      - 'README.*'
+      - '_pkgdown.yml'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: r-lib/actions/setup-r@v2
+      - uses: r-lib/actions/setup-pandoc@v2
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: any::pkgdown, local::.
+      - name: Build site into docs/
+        run: |
+          Rscript -e 'pkgdown::build_site(new_process = FALSE, install = FALSE)'
+      - name: Commit docs
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs
+          git commit -m "pkgdown: rebuild site" || echo "No changes to commit"
+          git push
