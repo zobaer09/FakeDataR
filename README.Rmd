@@ -7,7 +7,7 @@ output: github_document
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>",
+  comment  = "#>",
   fig.path = "man/figures/README-",
   out.width = "100%"
 )
@@ -17,39 +17,124 @@ knitr::opts_chunk$set(
 
 <!-- badges: start -->
 [![R-CMD-check](https://github.com/zobaer09/FakeDataR/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/zobaer09/FakeDataR/actions/workflows/R-CMD-check.yaml)
+[![pkgdown](https://img.shields.io/badge/docs-pkgdown-blue.svg)](https://zobaer09.github.io/FakeDataR/)
 <!-- badges: end -->
 
-The goal of FakeDataR is to ...
+**FakeDataR** creates synthetic tabular data that mirrors the structure and key patterns of a real dataset:
+
+- preserves types (numeric/integer/Date/POSIXct/logical/factor/character)  
+- keeps factor levels and NA / blank rates  
+- optional numeric generation by **range** or **distribution**  
+- privacy: detect `id`, `email`, `phone` columns and either **fake** or **drop** them  
+- generate from a **database schema** (no data read)  
+- export helpers (CSV/RDS/Parquet) and an **LLM bundle** for sharing
+
+**Docs:** [Website](https://zobaer09.github.io/FakeDataR/) • [Articles](https://zobaer09.github.io/FakeDataR/articles/) • [Reference](https://zobaer09.github.io/FakeDataR/reference/)
 
 ## Installation
 
-You can install the development version of FakeDataR like so:
-
-``` r
-# FILL THIS IN! HOW CAN PEOPLE INSTALL YOUR DEV PACKAGE?
+```r
+# install.packages("remotes")
+remotes::install_github("zobaer09/FakeDataR")
 ```
 
-## Example
+Optional:
+- `DBI`, `RSQLite` – for the database demo below  
+- `arrow` – to write Parquet via `export_fake()`
 
-This is a basic example which shows you how to solve a common problem:
+## Quick start
 
-```{r example}
+```{r}
 library(FakeDataR)
-## basic example code
+
+# Make fake data from a data frame
+fake_co2 <- generate_fake_data(as.data.frame(CO2), n = 200, seed = 1)
+head(fake_co2)
+
+# Validate key properties against the source
+validate_fake(as.data.frame(CO2), fake_co2)
 ```
 
-What is special about using `README.Rmd` instead of just `README.md`? You can include R chunks like so:
+## Privacy: detect & handle sensitive columns
 
-```{r cars}
-summary(cars)
+```{r}
+df <- data.frame(
+  id    = 1:10,
+  email = sprintf("user%02d@corp.com", 1:10),
+  phone = sprintf("(415) 555-%04d", 1:10),
+  spend = runif(10, 10, 100)
+)
+
+# Keep sensitive columns but fully synthetic content
+fake_keep <- generate_fake_data(
+  df, n = 20, seed = 2,
+  sensitive_detect   = TRUE,
+  sensitive_strategy = "fake"
+)
+
+# Or drop the sensitive columns entirely
+fake_drop <- generate_fake_data(
+  df, n = 20, seed = 2,
+  sensitive_detect   = TRUE,
+  sensitive_strategy = "drop"
+)
+
+names(fake_keep); names(fake_drop)
 ```
 
-You'll still need to render `README.Rmd` regularly, to keep `README.md` up-to-date. `devtools::build_readme()` is handy for this.
+## From a database schema (no rows read)
 
-You can also embed plots, for example:
+```{r, eval=requireNamespace("DBI", quietly = TRUE) && requireNamespace("RSQLite", quietly = TRUE) && identical(Sys.getenv("CI"), "")}
+library(DBI); library(RSQLite)
 
-```{r pressure, echo = FALSE}
-plot(pressure)
+con <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
+DBI::dbExecute(con, "
+  CREATE TABLE employees (
+    id INTEGER,
+    email TEXT,
+    phone TEXT,
+    is_active BOOLEAN,
+    hired_at TIMESTAMP,
+    salary NUMERIC,
+    dept TEXT
+  )
+")
+
+sch      <- schema_from_db(con, "employees")
+fake_db  <- generate_fake_from_schema(sch, n = 50, seed = 14)
+str(fake_db$hired_at)   # POSIXct
+
+DBI::dbDisconnect(con)
 ```
 
-In that case, don't forget to commit and push the resulting figure files, so they display on GitHub and CRAN.
+## Export (CSV/RDS/Parquet)
+
+```{r}
+tmp <- tempfile(fileext = ".csv")
+export_fake(fake_co2, tmp)
+
+# Parquet (if arrow is available)
+if (requireNamespace("arrow", quietly = TRUE)) {
+  export_fake(fake_co2, sub("\\.csv$", ".parquet", tmp))
+}
+```
+
+## Reproducibility
+
+All generators accept `seed` for deterministic output:
+
+```r
+a1 <- generate_fake_data(CO2, n = 123, seed = 42)
+a2 <- generate_fake_data(CO2, n = 123, seed = 42)
+identical(a1, a2)  # TRUE
+```
+
+## Learn more
+
+- **Getting started** article: overview & real-data smoke tests  
+- **Database workflow** article: schema-only generation + LLM bundle  
+- Full function docs: [reference](https://zobaer09.github.io/FakeDataR/reference/)
+
+---
+
+License: MIT. Contributions welcome via pull requests and issues.
