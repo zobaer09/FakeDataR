@@ -17,8 +17,15 @@ Imports:
     stats
 Suggests:
     testthat (>= 3.0.0),
-    DBI, RSQLite, arrow, dplyr, jsonlite, zip,
-    tibble, nycflights13, palmerpenguins, gapminder
+    knitr,
+    rmarkdown,
+    DBI,
+    RSQLite,
+    tibble,
+    nycflights13,
+    palmerpenguins,
+    gapminder,
+    arrow
 VignetteBuilder: knitr
 Config/testthat/edition: 3
 
