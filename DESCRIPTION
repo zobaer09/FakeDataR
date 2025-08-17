@@ -25,7 +25,8 @@ Suggests:
     nycflights13,
     palmerpenguins,
     gapminder,
-    arrow
+    arrow,
+    dplyr
 VignetteBuilder: knitr
 Config/testthat/edition: 3
 
