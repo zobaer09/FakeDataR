@@ -19,6 +19,6 @@ Suggests:
     testthat (>= 3.0.0),
     DBI, RSQLite, arrow, dplyr, jsonlite, zip,
     tibble, nycflights13, palmerpenguins, gapminder
-Config/testthat/edition: 3
 VignetteBuilder: knitr
+Config/testthat/edition: 3
 
