@@ -7,7 +7,7 @@ output: github_document
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment  = "#>",
+  comment = "#>",
   fig.path = "man/figures/README-",
   out.width = "100%"
 )
@@ -17,78 +17,84 @@ knitr::opts_chunk$set(
 
 <!-- badges: start -->
 [![R-CMD-check](https://github.com/zobaer09/FakeDataR/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/zobaer09/FakeDataR/actions/workflows/R-CMD-check.yaml)
-[![pkgdown](https://img.shields.io/badge/docs-pkgdown-blue.svg)](https://zobaer09.github.io/FakeDataR/)
+[📘 Website](https://zobaer09.github.io/FakeDataR/) • [Articles](https://zobaer09.github.io/FakeDataR/articles/) • [Reference](https://zobaer09.github.io/FakeDataR/reference/)
 <!-- badges: end -->
 
-**FakeDataR** creates synthetic tabular data that mirrors the structure and key patterns of a real dataset:
+**FakeDataR** makes safe, synthetic stand‑ins for real datasets.  
+It mirrors **types**, **factor levels**, **NA/blank rates**, and even handles **sensitive columns** (IDs, emails, phones) via *fake* or *drop* strategies. You can also generate fake tables from a **database schema** without reading any rows.
 
-- preserves types (numeric/integer/Date/POSIXct/logical/factor/character)  
-- keeps factor levels and NA / blank rates  
-- optional numeric generation by **range** or **distribution**  
-- privacy: detect `id`, `email`, `phone` columns and either **fake** or **drop** them  
-- generate from a **database schema** (no data read)  
-- export helpers (CSV/RDS/Parquet) and an **LLM bundle** for sharing
-
-**Docs:** [Website](https://zobaer09.github.io/FakeDataR/) • [Articles](https://zobaer09.github.io/FakeDataR/articles/) • [Reference](https://zobaer09.github.io/FakeDataR/reference/)
+---
 
 ## Installation
 
 ```r
-# install.packages("remotes")
-remotes::install_github("zobaer09/FakeDataR")
+# install.packages("devtools")
+devtools::install_github("zobaer09/FakeDataR")
 ```
-
-Optional:
-- `DBI`, `RSQLite` – for the database demo below  
-- `arrow` – to write Parquet via `export_fake()`
 
 ## Quick start
 
-```{r}
+Generate a fake dataset that matches the structure of a real one:
+
+```{r quick-start}
 library(FakeDataR)
 
-# Make fake data from a data frame
-fake_co2 <- generate_fake_data(as.data.frame(CO2), n = 200, seed = 1)
-head(fake_co2)
-
-# Validate key properties against the source
-validate_fake(as.data.frame(CO2), fake_co2)
+fake_mtc <- generate_fake_data(mtcars, n = 200, seed = 1)
+head(fake_mtc)
 ```
 
-## Privacy: detect & handle sensitive columns
+Validate that classes and basic patterns were preserved:
 
-```{r}
+```{r quick-validate}
+validate_fake(mtcars, fake_mtc)
+```
+
+Preserve factor levels & numeric ranges (example with `palmerpenguins`):
+
+```{r penguins, message=FALSE, warning=FALSE}
+if (requireNamespace("palmerpenguins", quietly = TRUE)) {
+  peng <- na.omit(palmerpenguins::penguins[, c("species","island","bill_length_mm","sex")])
+  fake_peng <- generate_fake_data(peng, n = 400, seed = 11, category_mode = "preserve")
+  validate_fake(peng, fake_peng)
+}
+```
+
+## Sensitive columns
+
+Detect and handle PII by name. Use strategy `"fake"` (default) or `"drop"`:
+
+```{r pii}
 df <- data.frame(
-  id    = 1:10,
-  email = sprintf("user%02d@corp.com", 1:10),
-  phone = sprintf("(415) 555-%04d", 1:10),
-  spend = runif(10, 10, 100)
+  id    = 1:50,
+  email = sprintf("user%03d@corp.com", 1:50),
+  phone = sprintf("(415) 555-%04d", 1:50),
+  spend = runif(50, 10, 500)
 )
 
-# Keep sensitive columns but fully synthetic content
+# Keep the columns but replace values with synthetic ones
 fake_keep <- generate_fake_data(
-  df, n = 20, seed = 2,
-  sensitive_detect   = TRUE,
-  sensitive_strategy = "fake"
+  df, n = 80, seed = 12,
+  sensitive_detect = TRUE, sensitive_strategy = "fake"
 )
+intersect(df$email, fake_keep$email)  # should be character(0)
 
-# Or drop the sensitive columns entirely
+# Drop sensitive columns entirely
 fake_drop <- generate_fake_data(
-  df, n = 20, seed = 2,
-  sensitive_detect   = TRUE,
-  sensitive_strategy = "drop"
+  df, n = 80, seed = 13,
+  sensitive_detect = TRUE, sensitive_strategy = "drop"
 )
-
-names(fake_keep); names(fake_drop)
+names(fake_drop)  # no id/email/phone
 ```
 
-## From a database schema (no rows read)
+## From a database schema (no data read)
 
-```{r, eval=requireNamespace("DBI", quietly = TRUE) && requireNamespace("RSQLite", quietly = TRUE) && identical(Sys.getenv("CI"), "")}
+Create fake rows using only the schema (types, nullability, etc.). This works even when you cannot access the underlying data.
+
+```{r db, eval=FALSE}
 library(DBI); library(RSQLite)
 
-con <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
-DBI::dbExecute(con, "
+con <- dbConnect(RSQLite::SQLite(), ":memory:")
+dbExecute(con, "
   CREATE TABLE employees (
     id INTEGER,
     email TEXT,
@@ -100,41 +106,59 @@ DBI::dbExecute(con, "
   )
 ")
 
-sch      <- schema_from_db(con, "employees")
-fake_db  <- generate_fake_from_schema(sch, n = 50, seed = 14)
-str(fake_db$hired_at)   # POSIXct
+sch  <- schema_from_db(con, "employees")
+fake <- generate_fake_from_schema(sch, n = 50, seed = 14)
 
-DBI::dbDisconnect(con)
+str(fake$hired_at)  # POSIXct
+dbDisconnect(con)
 ```
 
-## Export (CSV/RDS/Parquet)
+## Exporting
 
-```{r}
-tmp <- tempfile(fileext = ".csv")
-export_fake(fake_co2, tmp)
+Write fake data to common formats (CSV, RDS, Parquet) and optionally produce an **LLM bundle** containing a schema and README.
 
-# Parquet (if arrow is available)
-if (requireNamespace("arrow", quietly = TRUE)) {
-  export_fake(fake_co2, sub("\\.csv$", ".parquet", tmp))
-}
+```{r export, eval=FALSE}
+# CSV / RDS
+export_fake(fake_mtc, file.path(tempdir(), "fake_mtc.csv"))
+export_fake(fake_mtc, file.path(tempdir(), "fake_mtc.rds"))
+
+# Parquet (requires the 'arrow' package)
+# install.packages("arrow")
+export_fake(fake_mtc, file.path(tempdir(), "fake_mtc.parquet"))
+
+# End-to-end bundle
+b <- llm_bundle(
+  mtcars, n = 200, seed = 10, level = "high",
+  formats = c("csv","rds"),
+  path = tempdir(), filename = "mtcars_fake",
+  write_prompt = TRUE, zip = TRUE
+)
+b$zip_path
 ```
 
 ## Reproducibility
 
-All generators accept `seed` for deterministic output:
+All generators respect `seed`. Given the same inputs and a fixed package version, results are reproducible:
 
-```r
+```{r reproducibility}
 a1 <- generate_fake_data(CO2, n = 123, seed = 42)
 a2 <- generate_fake_data(CO2, n = 123, seed = 42)
-identical(a1, a2)  # TRUE
+identical(a1, a2)
 ```
 
 ## Learn more
 
-- **Getting started** article: overview & real-data smoke tests  
-- **Database workflow** article: schema-only generation + LLM bundle  
-- Full function docs: [reference](https://zobaer09.github.io/FakeDataR/reference/)
+- **Getting started** vignette: <https://zobaer09.github.io/FakeDataR/articles/getting-started.html>  
+- **Database workflow** vignette: <https://zobaer09.github.io/FakeDataR/articles/database-workflow.html>  
+- Full function **reference**: <https://zobaer09.github.io/FakeDataR/reference/>
 
 ---
 
-License: MIT. Contributions welcome via pull requests and issues.
+## Contributing
+
+Issues and pull requests are welcome! If you find a bug or have a feature request, please open an issue on GitHub.
+
+## License
+
+This package is distributed under the terms of the license included in the repository (see `LICENSE`).
+

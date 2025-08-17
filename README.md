@@ -6,110 +6,158 @@
 <!-- badges: start -->
 
 [![R-CMD-check](https://github.com/zobaer09/FakeDataR/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/zobaer09/FakeDataR/actions/workflows/R-CMD-check.yaml)
-[![pkgdown](https://img.shields.io/badge/docs-pkgdown-blue.svg)](https://zobaer09.github.io/FakeDataR/)
-<!-- badges: end -->
-
-**FakeDataR** creates synthetic tabular data that mirrors the structure
-and key patterns of a real dataset:
-
-- preserves types
-  (numeric/integer/Date/POSIXct/logical/factor/character)  
-- keeps factor levels and NA / blank rates  
-- optional numeric generation by **range** or **distribution**  
-- privacy: detect `id`, `email`, `phone` columns and either **fake** or
-  **drop** them  
-- generate from a **database schema** (no data read)  
-- export helpers (CSV/RDS/Parquet) and an **LLM bundle** for sharing
-
-**Docs:** [Website](https://zobaer09.github.io/FakeDataR/) •
+[📘 Website](https://zobaer09.github.io/FakeDataR/) •
 [Articles](https://zobaer09.github.io/FakeDataR/articles/) •
 [Reference](https://zobaer09.github.io/FakeDataR/reference/)
+<!-- badges: end -->
+
+**FakeDataR** makes safe, synthetic stand‑ins for real datasets.  
+It mirrors **types**, **factor levels**, **NA/blank rates**, and even
+handles **sensitive columns** (IDs, emails, phones) via *fake* or *drop*
+strategies. You can also generate fake tables from a **database schema**
+without reading any rows.
+
+------------------------------------------------------------------------
 
 ## Installation
 
 ``` r
-# install.packages("remotes")
-remotes::install_github("zobaer09/FakeDataR")
+# install.packages("devtools")
+devtools::install_github("zobaer09/FakeDataR")
 ```
 
-Optional: - `DBI`, `RSQLite` – for the database demo below  
-- `arrow` – to write Parquet via `export_fake()`
-
 ## Quick start
+
+Generate a fake dataset that matches the structure of a real one:
 
 ``` r
 library(FakeDataR)
 
-# Make fake data from a data frame
-fake_co2 <- generate_fake_data(as.data.frame(CO2), n = 200, seed = 1)
-head(fake_co2)
-#>   Plant        Type  Treatment     conc    uptake
-#> 1   Mn3 Mississippi nonchilled 270.3746 17.554606
-#> 2   Qc1      Quebec nonchilled 627.2001 34.931717
-#> 3   Mn1      Quebec nonchilled 775.1113 17.070400
-#> 4   Qn1 Mississippi nonchilled 879.8511 16.579817
-#> 5   Qn2 Mississippi    chilled 431.4751  8.494248
-#> 6   Mn1      Quebec    chilled 817.9272 17.702660
+fake_mtc <- generate_fake_data(mtcars, n = 200, seed = 1)
+head(fake_mtc)
+#>        mpg      cyl     disp        hp     drat       wt     qsec        vs
+#> 1 16.63945 5.070033 335.2440 282.43325 4.623352 3.588993 17.57882 0.2396067
+#> 2 19.14491 4.874581 145.2945 314.84395 2.834732 4.191491 20.72770 0.6477649
+#> 3 23.86205 6.067187 453.7102  93.73714 4.867064 3.012021 22.34145 0.9756708
+#> 4 31.74288 5.075802 431.0475 264.19953 4.376889 5.247958 20.15496 0.3779988
+#> 5 15.13953 4.724673 449.4281 328.11103 3.352964 1.975893 20.39140 0.4641441
+#> 6 31.51216 6.074305 361.2276 327.86627 4.229320 1.665920 21.62005 0.8122963
+#>           am     gear     carb
+#> 1 0.13853856 3.123219 7.102635
+#> 2 0.04752457 3.710643 7.770379
+#> 3 0.03391887 4.154076 7.068414
+#> 4 0.91608902 4.070063 4.064007
+#> 5 0.84020039 4.208546 2.343565
+#> 6 0.17887142 3.972298 1.576061
+```
 
-# Validate key properties against the source
-validate_fake(as.data.frame(CO2), fake_co2)
-#>      column class_original class_fake class_match na_prop_original na_prop_fake
-#> 1     Plant ordered/factor     factor       FALSE                0            0
-#> 2      Type         factor     factor        TRUE                0            0
-#> 3 Treatment         factor     factor        TRUE                0            0
-#> 4      conc        numeric    numeric        TRUE                0            0
-#> 5    uptake        numeric    numeric        TRUE                0            0
-#>   na_match blank_prop_original blank_prop_fake blank_match
-#> 1     TRUE                   0               0        TRUE
-#> 2     TRUE                   0               0        TRUE
-#> 3     TRUE                   0               0        TRUE
-#> 4     TRUE                  NA              NA          NA
-#> 5     TRUE                  NA              NA          NA
+Validate that classes and basic patterns were preserved:
+
+``` r
+validate_fake(mtcars, fake_mtc)
+#>    column class_original class_fake class_match na_prop_original na_prop_fake
+#> 1     mpg        numeric    numeric        TRUE                0            0
+#> 2     cyl        numeric    numeric        TRUE                0            0
+#> 3    disp        numeric    numeric        TRUE                0            0
+#> 4      hp        numeric    numeric        TRUE                0            0
+#> 5    drat        numeric    numeric        TRUE                0            0
+#> 6      wt        numeric    numeric        TRUE                0            0
+#> 7    qsec        numeric    numeric        TRUE                0            0
+#> 8      vs        numeric    numeric        TRUE                0            0
+#> 9      am        numeric    numeric        TRUE                0            0
+#> 10   gear        numeric    numeric        TRUE                0            0
+#> 11   carb        numeric    numeric        TRUE                0            0
+#>    na_match blank_prop_original blank_prop_fake blank_match
+#> 1      TRUE                  NA              NA          NA
+#> 2      TRUE                  NA              NA          NA
+#> 3      TRUE                  NA              NA          NA
+#> 4      TRUE                  NA              NA          NA
+#> 5      TRUE                  NA              NA          NA
+#> 6      TRUE                  NA              NA          NA
+#> 7      TRUE                  NA              NA          NA
+#> 8      TRUE                  NA              NA          NA
+#> 9      TRUE                  NA              NA          NA
+#> 10     TRUE                  NA              NA          NA
+#> 11     TRUE                  NA              NA          NA
+#>    range_within_original
+#> 1                   TRUE
+#> 2                   TRUE
+#> 3                   TRUE
+#> 4                   TRUE
+#> 5                   TRUE
+#> 6                   TRUE
+#> 7                   TRUE
+#> 8                   TRUE
+#> 9                   TRUE
+#> 10                  TRUE
+#> 11                  TRUE
+```
+
+Preserve factor levels & numeric ranges (example with `palmerpenguins`):
+
+``` r
+if (requireNamespace("palmerpenguins", quietly = TRUE)) {
+  peng <- na.omit(palmerpenguins::penguins[, c("species","island","bill_length_mm","sex")])
+  fake_peng <- generate_fake_data(peng, n = 400, seed = 11, category_mode = "preserve")
+  validate_fake(peng, fake_peng)
+}
+#>           column class_original class_fake class_match na_prop_original
+#> 1        species         factor     factor        TRUE                0
+#> 2         island         factor     factor        TRUE                0
+#> 3 bill_length_mm        numeric    numeric        TRUE                0
+#> 4            sex         factor     factor        TRUE                0
+#>   na_prop_fake na_match blank_prop_original blank_prop_fake blank_match
+#> 1            0     TRUE                   0               0        TRUE
+#> 2            0     TRUE                   0               0        TRUE
+#> 3            0     TRUE                  NA              NA          NA
+#> 4            0     TRUE                   0               0        TRUE
 #>   range_within_original
 #> 1                    NA
 #> 2                    NA
-#> 3                    NA
-#> 4                  TRUE
-#> 5                  TRUE
+#> 3                  TRUE
+#> 4                    NA
 ```
 
-## Privacy: detect & handle sensitive columns
+## Sensitive columns
+
+Detect and handle PII by name. Use strategy `"fake"` (default) or
+`"drop"`:
 
 ``` r
 df <- data.frame(
-  id    = 1:10,
-  email = sprintf("user%02d@corp.com", 1:10),
-  phone = sprintf("(415) 555-%04d", 1:10),
-  spend = runif(10, 10, 100)
+  id    = 1:50,
+  email = sprintf("user%03d@corp.com", 1:50),
+  phone = sprintf("(415) 555-%04d", 1:50),
+  spend = runif(50, 10, 500)
 )
 
-# Keep sensitive columns but fully synthetic content
+# Keep the columns but replace values with synthetic ones
 fake_keep <- generate_fake_data(
-  df, n = 20, seed = 2,
-  sensitive_detect   = TRUE,
-  sensitive_strategy = "fake"
+  df, n = 80, seed = 12,
+  sensitive_detect = TRUE, sensitive_strategy = "fake"
 )
+intersect(df$email, fake_keep$email)  # should be character(0)
+#> character(0)
 
-# Or drop the sensitive columns entirely
+# Drop sensitive columns entirely
 fake_drop <- generate_fake_data(
-  df, n = 20, seed = 2,
-  sensitive_detect   = TRUE,
-  sensitive_strategy = "drop"
+  df, n = 80, seed = 13,
+  sensitive_detect = TRUE, sensitive_strategy = "drop"
 )
-
-names(fake_keep); names(fake_drop)
-#> [1] "id"    "email" "phone" "spend"
+names(fake_drop)  # no id/email/phone
 #> [1] "spend"
 ```
 
-## From a database schema (no rows read)
+## From a database schema (no data read)
+
+Create fake rows using only the schema (types, nullability, etc.). This
+works even when you cannot access the underlying data.
 
 ``` r
 library(DBI); library(RSQLite)
-#> Warning: package 'DBI' was built under R version 4.3.3
 
-con <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
-DBI::dbExecute(con, "
+con <- dbConnect(RSQLite::SQLite(), ":memory:")
+dbExecute(con, "
   CREATE TABLE employees (
     id INTEGER,
     email TEXT,
@@ -120,45 +168,67 @@ DBI::dbExecute(con, "
     dept TEXT
   )
 ")
-#> [1] 0
 
-sch      <- schema_from_db(con, "employees")
-fake_db  <- generate_fake_from_schema(sch, n = 50, seed = 14)
-str(fake_db$hired_at)   # POSIXct
-#>  POSIXct[1:50], format: "2025-08-10 22:43:46" "2025-08-10 14:08:52" "2025-08-11 19:20:36" ...
+sch  <- schema_from_db(con, "employees")
+fake <- generate_fake_from_schema(sch, n = 50, seed = 14)
 
-DBI::dbDisconnect(con)
+str(fake$hired_at)  # POSIXct
+dbDisconnect(con)
 ```
 
-## Export (CSV/RDS/Parquet)
+## Exporting
+
+Write fake data to common formats (CSV, RDS, Parquet) and optionally
+produce an **LLM bundle** containing a schema and README.
 
 ``` r
-tmp <- tempfile(fileext = ".csv")
-export_fake(fake_co2, tmp)
+# CSV / RDS
+export_fake(fake_mtc, file.path(tempdir(), "fake_mtc.csv"))
+export_fake(fake_mtc, file.path(tempdir(), "fake_mtc.rds"))
 
-# Parquet (if arrow is available)
-if (requireNamespace("arrow", quietly = TRUE)) {
-  export_fake(fake_co2, sub("\\.csv$", ".parquet", tmp))
-}
+# Parquet (requires the 'arrow' package)
+# install.packages("arrow")
+export_fake(fake_mtc, file.path(tempdir(), "fake_mtc.parquet"))
+
+# End-to-end bundle
+b <- llm_bundle(
+  mtcars, n = 200, seed = 10, level = "high",
+  formats = c("csv","rds"),
+  path = tempdir(), filename = "mtcars_fake",
+  write_prompt = TRUE, zip = TRUE
+)
+b$zip_path
 ```
 
 ## Reproducibility
 
-All generators accept `seed` for deterministic output:
+All generators respect `seed`. Given the same inputs and a fixed package
+version, results are reproducible:
 
 ``` r
 a1 <- generate_fake_data(CO2, n = 123, seed = 42)
 a2 <- generate_fake_data(CO2, n = 123, seed = 42)
-identical(a1, a2)  # TRUE
+identical(a1, a2)
+#> [1] TRUE
 ```
 
 ## Learn more
 
-- **Getting started** article: overview & real-data smoke tests  
-- **Database workflow** article: schema-only generation + LLM bundle  
-- Full function docs:
-  [reference](https://zobaer09.github.io/FakeDataR/reference/)
+- **Getting started** vignette:
+  <https://zobaer09.github.io/FakeDataR/articles/getting-started.html>  
+- **Database workflow** vignette:
+  <https://zobaer09.github.io/FakeDataR/articles/database-workflow.html>  
+- Full function **reference**:
+  <https://zobaer09.github.io/FakeDataR/reference/>
 
 ------------------------------------------------------------------------
 
-License: MIT. Contributions welcome via pull requests and issues.
+## Contributing
+
+Issues and pull requests are welcome! If you find a bug or have a
+feature request, please open an issue on GitHub.
+
+## License
+
+This package is distributed under the terms of the license included in
+the repository (see `LICENSE`).
