@@ -1,75 +1,75 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>/404.html</loc>
+    <loc>https://zobaer09.github.io/FakeDataR/404.html</loc>
   </url>
   <url>
-    <loc>/articles/database-workflow.html</loc>
+    <loc>https://zobaer09.github.io/FakeDataR/articles/database-workflow.html</loc>
   </url>
   <url>
-    <loc>/articles/getting-started.html</loc>
+    <loc>https://zobaer09.github.io/FakeDataR/articles/getting-started.html</loc>
   </url>
   <url>
-    <loc>/articles/index.html</loc>
+    <loc>https://zobaer09.github.io/FakeDataR/articles/index.html</loc>
   </url>
   <url>
-    <loc>/articles/overview.html</loc>
+    <loc>https://zobaer09.github.io/FakeDataR/articles/overview.html</loc>
   </url>
   <url>
-    <loc>/authors.html</loc>
+    <loc>https://zobaer09.github.io/FakeDataR/authors.html</loc>
   </url>
   <url>
-    <loc>/index.html</loc>
+    <loc>https://zobaer09.github.io/FakeDataR/index.html</loc>
   </url>
   <url>
-    <loc>/LICENSE-text.html</loc>
+    <loc>https://zobaer09.github.io/FakeDataR/LICENSE-text.html</loc>
   </url>
   <url>
-    <loc>/LICENSE.html</loc>
+    <loc>https://zobaer09.github.io/FakeDataR/LICENSE.html</loc>
   </url>
   <url>
-    <loc>/news/index.html</loc>
+    <loc>https://zobaer09.github.io/FakeDataR/news/index.html</loc>
   </url>
   <url>
-    <loc>/reference/export_fake.html</loc>
+    <loc>https://zobaer09.github.io/FakeDataR/reference/export_fake.html</loc>
   </url>
   <url>
-    <loc>/reference/generate_fake_data.html</loc>
+    <loc>https://zobaer09.github.io/FakeDataR/reference/generate_fake_data.html</loc>
   </url>
   <url>
-    <loc>/reference/generate_fake_from_schema.html</loc>
+    <loc>https://zobaer09.github.io/FakeDataR/reference/generate_fake_from_schema.html</loc>
   </url>
   <url>
-    <loc>/reference/generate_fake_posixct_column.html</loc>
+    <loc>https://zobaer09.github.io/FakeDataR/reference/generate_fake_posixct_column.html</loc>
   </url>
   <url>
-    <loc>/reference/generate_fake_with_privacy.html</loc>
+    <loc>https://zobaer09.github.io/FakeDataR/reference/generate_fake_with_privacy.html</loc>
   </url>
   <url>
-    <loc>/reference/generate_llm_prompt.html</loc>
+    <loc>https://zobaer09.github.io/FakeDataR/reference/generate_llm_prompt.html</loc>
   </url>
   <url>
-    <loc>/reference/grapes-or-or-grapes.html</loc>
+    <loc>https://zobaer09.github.io/FakeDataR/reference/grapes-or-or-grapes.html</loc>
   </url>
   <url>
-    <loc>/reference/index.html</loc>
+    <loc>https://zobaer09.github.io/FakeDataR/reference/index.html</loc>
   </url>
   <url>
-    <loc>/reference/llm_bundle.html</loc>
+    <loc>https://zobaer09.github.io/FakeDataR/reference/llm_bundle.html</loc>
   </url>
   <url>
-    <loc>/reference/llm_bundle_from_db.html</loc>
+    <loc>https://zobaer09.github.io/FakeDataR/reference/llm_bundle_from_db.html</loc>
   </url>
   <url>
-    <loc>/reference/prepare_input_data.html</loc>
+    <loc>https://zobaer09.github.io/FakeDataR/reference/prepare_input_data.html</loc>
   </url>
   <url>
-    <loc>/reference/schema_from_db.html</loc>
+    <loc>https://zobaer09.github.io/FakeDataR/reference/schema_from_db.html</loc>
   </url>
   <url>
-    <loc>/reference/validate_fake.html</loc>
+    <loc>https://zobaer09.github.io/FakeDataR/reference/validate_fake.html</loc>
   </url>
   <url>
-    <loc>/reference/zip_llm_bundle.html</loc>
+    <loc>https://zobaer09.github.io/FakeDataR/reference/zip_llm_bundle.html</loc>
   </url>
 </urlset>
