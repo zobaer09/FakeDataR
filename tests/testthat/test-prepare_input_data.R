@@ -1,3 +1,5 @@
+testthat::skip_if_not_installed("tibble")
+
 test_that("prepare_input_data coerces common objects", {
   # tibble
   tb <- tibble::as_tibble(mtcars)
@@ -29,3 +31,5 @@ test_that("prepare_input_data coerces common objects", {
   out <- prepare_input_data(fit)
   expect_true(all(c("mpg", "wt", "hp") %in% names(out)))
 })
+
+

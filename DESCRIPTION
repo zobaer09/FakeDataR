@@ -17,13 +17,8 @@ Imports:
     stats
 Suggests:
     testthat (>= 3.0.0),
-    DBI,
-    RSQLite,
-    arrow,
-    nycflights13,
-    palmerpenguins,
-    gapminder,
-    tibble
+    DBI, RSQLite, arrow, dplyr, jsonlite, zip,
+    tibble, nycflights13, palmerpenguins, gapminder
 Config/testthat/edition: 3
 VignetteBuilder: knitr
-testthat::skip_if_not_installed("tibble")
+

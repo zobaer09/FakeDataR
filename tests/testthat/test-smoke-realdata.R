@@ -1,6 +1,12 @@
 ## 2b) As a quick automated test (`tests/testthat/test-smoke-realdata.R`)
 ## (keeps CI fast and won’t run on CRAN if you add CRAN later)
 
+testthat::skip_if_not_installed("gapminder")
+testthat::skip_if_not_installed("nycflights13")
+testthat::skip_if_not_installed("palmerpenguins")
+testthat::skip_if_not_installed("dplyr")
+testthat::skip_if_not_installed("tibble")
+
 test_that("real-data smoke: gapminder", {
   skip_if_not_installed("gapminder")
   set.seed(21)

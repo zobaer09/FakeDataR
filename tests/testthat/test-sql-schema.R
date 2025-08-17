@@ -1,3 +1,6 @@
+testthat::skip_if_not_installed("DBI")
+testthat::skip_if_not_installed("RSQLite")
+
 test_that("schema_from_db + generate_fake_from_schema work without reading rows", {
   testthat::skip_if_not_installed("DBI")
   testthat::skip_if_not_installed("RSQLite")
