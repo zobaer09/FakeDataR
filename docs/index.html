@@ -75,35 +75,161 @@
 </h1></div>
 <!-- badges: start -->
 
-<p>The goal of FakeDataR is to …</p>
+<p><strong>FakeDataR</strong> creates synthetic tabular data that mirrors the structure and key patterns of a real dataset:</p>
+<ul>
+<li>preserves types (numeric/integer/Date/POSIXct/logical/factor/character)<br>
+</li>
+<li>keeps factor levels and NA / blank rates<br>
+</li>
+<li>optional numeric generation by <strong>range</strong> or <strong>distribution</strong><br>
+</li>
+<li>privacy: detect <code>id</code>, <code>email</code>, <code>phone</code> columns and either <strong>fake</strong> or <strong>drop</strong> them<br>
+</li>
+<li>generate from a <strong>database schema</strong> (no data read)<br>
+</li>
+<li>export helpers (CSV/RDS/Parquet) and an <strong>LLM bundle</strong> for sharing</li>
+</ul>
+<p><strong>Docs:</strong> <a href="https://zobaer09.github.io/FakeDataR/">Website</a> • <a href="https://zobaer09.github.io/FakeDataR/articles/">Articles</a> • <a href="https://zobaer09.github.io/FakeDataR/reference/">Reference</a></p>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
-<p>You can install the development version of FakeDataR like so:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># FILL THIS IN! HOW CAN PEOPLE INSTALL YOUR DEV PACKAGE?</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># install.packages("remotes")</span></span>
+<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"zobaer09/FakeDataR"</span><span class="op">)</span></span></code></pre></div>
+<p>Optional: - <code>DBI</code>, <code>RSQLite</code> – for the database demo below<br>
+- <code>arrow</code> – to write Parquet via <code><a href="reference/export_fake.html">export_fake()</a></code></p>
 </div>
 <div class="section level2">
-<h2 id="example">Example<a class="anchor" aria-label="anchor" href="#example"></a>
+<h2 id="quick-start">Quick start<a class="anchor" aria-label="anchor" href="#quick-start"></a>
 </h2>
-<p>This is a basic example which shows you how to solve a common problem:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/zobaer09/FakeDataR" class="external-link">FakeDataR</a></span><span class="op">)</span></span>
-<span><span class="co">## basic example code</span></span></code></pre></div>
-<p>What is special about using <code>README.Rmd</code> instead of just <code>README.md</code>? You can include R chunks like so:</p>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://zobaer09.github.io/FakeDataR/">FakeDataR</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Make fake data from a data frame</span></span>
+<span><span class="va">fake_co2</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/generate_fake_data.html">generate_fake_data</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">CO2</span><span class="op">)</span>, n <span class="op">=</span> <span class="fl">200</span>, seed <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">fake_co2</span><span class="op">)</span></span>
+<span><span class="co">#&gt;   Plant        Type  Treatment     conc    uptake</span></span>
+<span><span class="co">#&gt; 1   Mn3 Mississippi nonchilled 270.3746 17.554606</span></span>
+<span><span class="co">#&gt; 2   Qc1      Quebec nonchilled 627.2001 34.931717</span></span>
+<span><span class="co">#&gt; 3   Mn1      Quebec nonchilled 775.1113 17.070400</span></span>
+<span><span class="co">#&gt; 4   Qn1 Mississippi nonchilled 879.8511 16.579817</span></span>
+<span><span class="co">#&gt; 5   Qn2 Mississippi    chilled 431.4751  8.494248</span></span>
+<span><span class="co">#&gt; 6   Mn1      Quebec    chilled 817.9272 17.702660</span></span>
+<span></span>
+<span><span class="co"># Validate key properties against the source</span></span>
+<span><span class="fu"><a href="reference/validate_fake.html">validate_fake</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">CO2</span><span class="op">)</span>, <span class="va">fake_co2</span><span class="op">)</span></span>
+<span><span class="co">#&gt;      column class_original class_fake class_match na_prop_original na_prop_fake</span></span>
+<span><span class="co">#&gt; 1     Plant ordered/factor     factor       FALSE                0            0</span></span>
+<span><span class="co">#&gt; 2      Type         factor     factor        TRUE                0            0</span></span>
+<span><span class="co">#&gt; 3 Treatment         factor     factor        TRUE                0            0</span></span>
+<span><span class="co">#&gt; 4      conc        numeric    numeric        TRUE                0            0</span></span>
+<span><span class="co">#&gt; 5    uptake        numeric    numeric        TRUE                0            0</span></span>
+<span><span class="co">#&gt;   na_match blank_prop_original blank_prop_fake blank_match</span></span>
+<span><span class="co">#&gt; 1     TRUE                   0               0        TRUE</span></span>
+<span><span class="co">#&gt; 2     TRUE                   0               0        TRUE</span></span>
+<span><span class="co">#&gt; 3     TRUE                   0               0        TRUE</span></span>
+<span><span class="co">#&gt; 4     TRUE                  NA              NA          NA</span></span>
+<span><span class="co">#&gt; 5     TRUE                  NA              NA          NA</span></span>
+<span><span class="co">#&gt;   range_within_original</span></span>
+<span><span class="co">#&gt; 1                    NA</span></span>
+<span><span class="co">#&gt; 2                    NA</span></span>
+<span><span class="co">#&gt; 3                    NA</span></span>
+<span><span class="co">#&gt; 4                  TRUE</span></span>
+<span><span class="co">#&gt; 5                  TRUE</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="privacy-detect--handle-sensitive-columns">Privacy: detect &amp; handle sensitive columns<a class="anchor" aria-label="anchor" href="#privacy-detect--handle-sensitive-columns"></a>
+</h2>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">cars</span><span class="op">)</span></span>
-<span><span class="co">#&gt;      speed           dist       </span></span>
-<span><span class="co">#&gt;  Min.   : 4.0   Min.   :  2.00  </span></span>
-<span><span class="co">#&gt;  1st Qu.:12.0   1st Qu.: 26.00  </span></span>
-<span><span class="co">#&gt;  Median :15.0   Median : 36.00  </span></span>
-<span><span class="co">#&gt;  Mean   :15.4   Mean   : 42.98  </span></span>
-<span><span class="co">#&gt;  3rd Qu.:19.0   3rd Qu.: 56.00  </span></span>
-<span><span class="co">#&gt;  Max.   :25.0   Max.   :120.00</span></span></code></pre></div>
-<p>You’ll still need to render <code>README.Rmd</code> regularly, to keep <code>README.md</code> up-to-date. <code><a href="https://devtools.r-lib.org/reference/build_rmd.html" class="external-link">devtools::build_readme()</a></code> is handy for this.</p>
-<p>You can also embed plots, for example:</p>
-<p><img src="reference/figures/README-pressure-1.png" width="100%"></p>
-<p>In that case, don’t forget to commit and push the resulting figure files, so they display on GitHub and CRAN.</p>
+<code class="sourceCode R"><span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>  id    <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">10</span>,</span>
+<span>  email <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="st">"user%02d@corp.com"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">)</span>,</span>
+<span>  phone <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="st">"(415) 555-%04d"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">)</span>,</span>
+<span>  spend <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">10</span>, <span class="fl">100</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Keep sensitive columns but fully synthetic content</span></span>
+<span><span class="va">fake_keep</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/generate_fake_data.html">generate_fake_data</a></span><span class="op">(</span></span>
+<span>  <span class="va">df</span>, n <span class="op">=</span> <span class="fl">20</span>, seed <span class="op">=</span> <span class="fl">2</span>,</span>
+<span>  sensitive_detect   <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  sensitive_strategy <span class="op">=</span> <span class="st">"fake"</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Or drop the sensitive columns entirely</span></span>
+<span><span class="va">fake_drop</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/generate_fake_data.html">generate_fake_data</a></span><span class="op">(</span></span>
+<span>  <span class="va">df</span>, n <span class="op">=</span> <span class="fl">20</span>, seed <span class="op">=</span> <span class="fl">2</span>,</span>
+<span>  sensitive_detect   <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  sensitive_strategy <span class="op">=</span> <span class="st">"drop"</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">fake_keep</span><span class="op">)</span>; <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">fake_drop</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "id"    "email" "phone" "spend"</span></span>
+<span><span class="co">#&gt; [1] "spend"</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="from-a-database-schema-no-rows-read">From a database schema (no rows read)<a class="anchor" aria-label="anchor" href="#from-a-database-schema-no-rows-read"></a>
+</h2>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dbi.r-dbi.org" class="external-link">DBI</a></span><span class="op">)</span>; <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rsqlite.r-dbi.org" class="external-link">RSQLite</a></span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning: package 'DBI' was built under R version 4.3.3</span></span>
+<span></span>
+<span><span class="va">con</span> <span class="op">&lt;-</span> <span class="fu">DBI</span><span class="fu">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbConnect.html" class="external-link">dbConnect</a></span><span class="op">(</span><span class="fu">RSQLite</span><span class="fu">::</span><span class="fu"><a href="https://rsqlite.r-dbi.org/reference/SQLite.html" class="external-link">SQLite</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">":memory:"</span><span class="op">)</span></span>
+<span><span class="fu">DBI</span><span class="fu">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbExecute.html" class="external-link">dbExecute</a></span><span class="op">(</span><span class="va">con</span>, <span class="st">"</span></span>
+<span><span class="st">  CREATE TABLE employees (</span></span>
+<span><span class="st">    id INTEGER,</span></span>
+<span><span class="st">    email TEXT,</span></span>
+<span><span class="st">    phone TEXT,</span></span>
+<span><span class="st">    is_active BOOLEAN,</span></span>
+<span><span class="st">    hired_at TIMESTAMP,</span></span>
+<span><span class="st">    salary NUMERIC,</span></span>
+<span><span class="st">    dept TEXT</span></span>
+<span><span class="st">  )</span></span>
+<span><span class="st">"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 0</span></span>
+<span></span>
+<span><span class="va">sch</span>      <span class="op">&lt;-</span> <span class="fu"><a href="reference/schema_from_db.html">schema_from_db</a></span><span class="op">(</span><span class="va">con</span>, <span class="st">"employees"</span><span class="op">)</span></span>
+<span><span class="va">fake_db</span>  <span class="op">&lt;-</span> <span class="fu"><a href="reference/generate_fake_from_schema.html">generate_fake_from_schema</a></span><span class="op">(</span><span class="va">sch</span>, n <span class="op">=</span> <span class="fl">50</span>, seed <span class="op">=</span> <span class="fl">14</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">fake_db</span><span class="op">$</span><span class="va">hired_at</span><span class="op">)</span>   <span class="co"># POSIXct</span></span>
+<span><span class="co">#&gt;  POSIXct[1:50], format: "2025-08-10 22:43:46" "2025-08-10 14:08:52" "2025-08-11 19:20:36" ...</span></span>
+<span></span>
+<span><span class="fu">DBI</span><span class="fu">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbDisconnect.html" class="external-link">dbDisconnect</a></span><span class="op">(</span><span class="va">con</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="export-csvrdsparquet">Export (CSV/RDS/Parquet)<a class="anchor" aria-label="anchor" href="#export-csvrdsparquet"></a>
+</h2>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">tmp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>fileext <span class="op">=</span> <span class="st">".csv"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="reference/export_fake.html">export_fake</a></span><span class="op">(</span><span class="va">fake_co2</span>, <span class="va">tmp</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Parquet (if arrow is available)</span></span>
+<span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"arrow"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu"><a href="reference/export_fake.html">export_fake</a></span><span class="op">(</span><span class="va">fake_co2</span>, <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">sub</a></span><span class="op">(</span><span class="st">"\\.csv$"</span>, <span class="st">".parquet"</span>, <span class="va">tmp</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">}</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="reproducibility">Reproducibility<a class="anchor" aria-label="anchor" href="#reproducibility"></a>
+</h2>
+<p>All generators accept <code>seed</code> for deterministic output:</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">a1</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/generate_fake_data.html">generate_fake_data</a></span><span class="op">(</span><span class="va">CO2</span>, n <span class="op">=</span> <span class="fl">123</span>, seed <span class="op">=</span> <span class="fl">42</span><span class="op">)</span></span>
+<span><span class="va">a2</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/generate_fake_data.html">generate_fake_data</a></span><span class="op">(</span><span class="va">CO2</span>, n <span class="op">=</span> <span class="fl">123</span>, seed <span class="op">=</span> <span class="fl">42</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">a1</span>, <span class="va">a2</span><span class="op">)</span>  <span class="co"># TRUE</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="learn-more">Learn more<a class="anchor" aria-label="anchor" href="#learn-more"></a>
+</h2>
+<ul>
+<li>
+<strong>Getting started</strong> article: overview &amp; real-data smoke tests<br>
+</li>
+<li>
+<strong>Database workflow</strong> article: schema-only generation + LLM bundle<br>
+</li>
+<li>Full function docs: <a href="https://zobaer09.github.io/FakeDataR/reference/">reference</a>
+</li>
+</ul>
+<hr>
+<p>License: MIT. Contributions welcome via pull requests and issues.</p>
 </div>
 </div>
   </main><aside class="col-md-3"><div class="links">
@@ -141,6 +267,7 @@
 <h2 data-toc-skip>Dev status</h2>
 <ul class="list-unstyled">
 <li><a href="https://github.com/zobaer09/FakeDataR/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://github.com/zobaer09/FakeDataR/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check"></a></li>
+<li><a href="https://zobaer09.github.io/FakeDataR/"><img src="https://img.shields.io/badge/docs-pkgdown-blue.svg" alt="pkgdown"></a></li>
 </ul>
 </div>
 
