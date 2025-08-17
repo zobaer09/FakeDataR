@@ -13,9 +13,17 @@ BugReports: https://github.com/zobaer09/FakeDataR/issues
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
+Imports:
+    stats
 Suggests:
     testthat (>= 3.0.0),
-    knitr,
-    rmarkdown
-VignetteBuilder: knitr
+    DBI,
+    RSQLite,
+    arrow,
+    nycflights13,
+    palmerpenguins,
+    gapminder,
+    tibble
 Config/testthat/edition: 3
+VignetteBuilder: knitr
+testthat::skip_if_not_installed("tibble")
