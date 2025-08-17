@@ -8,12 +8,14 @@ Description: Generate privacy-preserving synthetic datasets that mirror
     (data + JSON schema + README); and build fake data directly from SQL
     schemas without reading real rows.
 License: MIT + file LICENSE
-URL: https://github.com/zobaer09/FakeDataR
+URL: https://zobaer09.github.io/FakeDataR/
 BugReports: https://github.com/zobaer09/FakeDataR/issues
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
-Suggests: 
+Suggests:
+    testthat (>= 3.0.0),
     knitr,
     rmarkdown
 VignetteBuilder: knitr
+Config/testthat/edition: 3
