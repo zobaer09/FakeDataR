@@ -1,26 +1,19 @@
 Package: FakeDataR
-Title: Privacy-Preserving Fake Data from Real Dataset Structure
-Version: 0.2.0
+Title: Privacy-Preserving Synthetic Data for LLM Workflows
+Version: 0.0.0.9000
 Authors@R: 
-    person("Zobaer", "Ahmed", , "you@example.com", role = c("aut", "cre"))
-Description: Generate synthetic datasets that mirror structure, types,
-    NA/blank patterns, and dates/times of real data without copying real
-    values. Includes privacy presets, export helpers, and validation tools
-    for safe LLM workflows.
+    person("Zobaer", "Ahmed", , "you@email.com", role = c("aut", "cre"))
+Description: Generate privacy-preserving synthetic datasets that mirror
+    structure, types, levels, and missingness; export LLM-ready bundles
+    (data + JSON schema + README); and build fake data directly from SQL
+    schemas without reading real rows.
 License: MIT + file LICENSE
-URL: https://github.com/<yourname>/FakeDataR,
-    https://<yourname>.github.io/FakeDataR/
-BugReports: https://github.com/<yourname>/FakeDataR/issues
+URL: https://github.com/zobaer09/FakeDataR
+BugReports: https://github.com/zobaer09/FakeDataR/issues
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
-Imports: 
-    stats
 Suggests: 
-    dplyr,
-    tibble,
-    arrow,
-    jsonlite,
-    testthat,
-    zip
-Config/testthat/edition: 3
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr

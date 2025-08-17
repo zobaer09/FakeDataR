@@ -1,0 +1,185 @@
+---
+title: "FakeDataR: Getting started"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{FakeDataR: Getting started}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>", message = FALSE, warning = FALSE)
+set.seed(1)  # ensure RNG is initialized for clean vignette sessions
+```
+
+This vignette shows how to mirror the structure of real data with fully synthetic values, verify the structure, and produce an LLM-ready bundle.
+
+## Quick start
+
+```{r}
+library(FakeDataR)
+
+# Basic fake from a data.frame
+fake_mtc <- generate_fake_data(mtcars, n = 200, seed = 1)
+validate_fake(mtcars, fake_mtc)
+
+```
+
+
+## Factors, characters, and numerics
+
+```{r}
+fake_co2 <- generate_fake_data(as.data.frame(CO2), n = 200, seed = 2)
+validate_fake(as.data.frame(CO2), fake_co2)
+
+```
+
+```{r}
+fake_tg <- generate_fake_data(ToothGrowth, n = 120, seed = 3)
+validate_fake(ToothGrowth, fake_tg)
+```
+
+## Dates and POSIXct (time zones preserved)
+
+```{r}
+df_date <- data.frame(d = seq(as.Date("2020-01-01"), by = "day", length.out = 50))
+fake_date <- generate_fake_data(df_date, n = 80, seed = 4)
+str(fake_date$d)
+
+```
+
+```{r}
+dt <- data.frame(
+  when = seq.POSIXt(as.POSIXct("2023-05-01 00:00:00", tz = "America/New_York"),
+                    by = "hour", length.out = 200)
+)
+fake_dt <- generate_fake_data(dt, n = 50, seed = 5)
+str(fake_dt$when)
+range(fake_dt$when)
+
+```
+
+## Public datasets (optional)
+
+These chunks run only if the packages are installed.
+
+```{r}
+fl <- nycflights13::flights
+set.seed(10)
+fl_small <- fl[sample.int(nrow(fl), 5000), ]
+fake_fl <- generate_fake_data(fl_small, n = 2000, seed = 10, numeric_mode = "distribution")
+validate_fake(fl_small, fake_fl)
+```
+
+```{r}
+peng <- na.omit(palmerpenguins::penguins[, c("species","island","bill_length_mm","sex")])
+fake_peng <- generate_fake_data(peng, n = 600, seed = 11, category_mode = "preserve")
+validate_fake(peng, fake_peng)
+
+```
+
+## Gapminder demo
+
+```{r gapminder-demo, message=FALSE}
+# Optional package; make the chunk robust
+if (requireNamespace("gapminder", quietly = TRUE)) {
+  set.seed(21)
+  gm <- gapminder::gapminder
+  # Keep it light if you want: gm <- gm[sample.int(nrow(gm), 2000), ]
+
+  fake_gm <- generate_fake_data(
+    gm, n = 1500, seed = 21,
+    numeric_mode = "distribution",  # nicer numeric spread
+    category_mode = "preserve"      # keep factor levels
+  )
+
+  validate_fake(gm, fake_gm)
+} else {
+  message("gapminder not installed; skipping demo.")
+}
+```
+
+
+
+## Sensitive columns: fake vs drop
+
+```{r pii-demo, message=FALSE}
+set.seed(12)
+df_pii <- data.frame(
+  id    = 1:100,
+  email = sprintf("user%03d@corp.com", 1:100),
+  phone = sprintf("(415) 555-%04d", 1:100),
+  spend = runif(100, 10, 500)
+)
+
+fake_keep <- generate_fake_data(
+  df_pii, n = 120,
+  sensitive_detect   = TRUE,
+  sensitive_strategy = "fake"
+)
+fake_drop <- generate_fake_data(
+  df_pii, n = 120,
+  sensitive_detect   = TRUE,
+  sensitive_strategy = "drop"
+)
+
+names(fake_keep)        # expect id/email/phone present but synthetic
+names(fake_drop)        # expect only "spend"
+
+```
+
+
+## LLM bundle: data + schema + README (+ optional ZIP)
+
+```{r}
+b1 <- llm_bundle(
+  data = ToothGrowth, n = 150, level = "high", seed = 10,
+  formats = c("csv","rds"),
+  path = tempdir(), filename = "toothgrowth_fake",
+  write_prompt = TRUE, zip = TRUE
+)
+b1$schema_path
+b1$readme_path
+b1$zip_path
+
+```
+
+## Parquet export (optional)
+
+```{r}
+fake_air <- generate_fake_data(airquality, n = 1000, seed = 20)
+export_fake(fake_air, file.path(tempdir(), "air.parquet"))
+
+```
+
+## Reproducibility
+
+```{r}
+a1 <- generate_fake_data(CO2, n = 123, seed = 42)
+a2 <- generate_fake_data(CO2, n = 123, seed = 42)
+identical(a1, a2)
+
+```
+
+```{r}
+big <- data.frame(
+  a = runif(2e5),
+  b = sample(letters, 2e5, TRUE),
+  c = as.Date("2020-01-01") + sample.int(3000, 2e5, TRUE)
+)
+system.time({
+  fake_big <- generate_fake_data(big, n = 2e5, seed = 99)
+})
+
+```
+
+
+
+
+
+
+
+
+
+
+

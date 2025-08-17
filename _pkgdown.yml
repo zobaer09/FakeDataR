@@ -8,23 +8,27 @@ navbar:
   components:
     github:
       icon: fab fa-github
-      href: https://github.com/<yourname>/FakeDataR
+      href: https://github.com/zobaer09/FakeDataR
 
 reference:
-  - title: "Generate"
+  - title: Generate
     contents:
       - generate_fake_data
       - generate_fake_with_privacy
-  - title: "Utilities"
+      - generate_fake_from_schema
+      - schema_from_db
+  - title: Privacy & Bundles
+    contents:
+      - llm_bundle
+      - llm_bundle_from_db
+      - generate_llm_prompt
+      - zip_llm_bundle
+  - title: Utilities
     contents:
       - validate_fake
       - export_fake
       - prepare_input_data
-      - llm_bundle
+      - generate_fake_posixct_column
 
 development:
   mode: auto
-
-# Avoid re-install in a new R process on Windows
-new_process: false
-

@@ -1,0 +1,64 @@
+---
+title: "Database schema workflow (no data read)"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Database schema workflow (no data read)}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup-db, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>", message = FALSE, warning = FALSE)
+```
+
+This vignette shows how to introspect a table definition only and generate synthetic rows without reading any real data.
+
+```{r db-all, echo=TRUE, message=FALSE, warning=FALSE}
+ok <- TRUE; msg <- NULL
+out <- tryCatch({
+  if (!requireNamespace("DBI", quietly = TRUE) ||
+      !requireNamespace("RSQLite", quietly = TRUE)) {
+    stop("DBI/RSQLite not installed")
+  }
+  library(DBI); library(RSQLite); library(FakeDataR)
+
+  # Use a file-backed DB (more stable in knitr than ':memory:')
+  dbfile <- file.path(tempdir(), "employees.sqlite")
+  con <- DBI::dbConnect(RSQLite::SQLite(), dbfile)
+  on.exit(try(DBI::dbDisconnect(con), silent = TRUE), add = TRUE)
+
+  DBI::dbExecute(con, "
+    CREATE TABLE IF NOT EXISTS employees (
+      id INTEGER,
+      email TEXT,
+      phone TEXT,
+      is_active BOOLEAN,
+      hired_at TIMESTAMP,
+      salary NUMERIC,
+      dept TEXT
+    )
+  ")
+
+  sch  <- schema_from_db(con, "employees")
+  fake <- generate_fake_from_schema(sch, n = 50, seed = 14)
+  b2 <- llm_bundle_from_db(
+    conn = con, table = "employees",
+    n = 100, seed = 15, level = "high",
+    formats = "csv", path = tempdir(), filename = "employees_fake",
+    write_prompt = TRUE, sensitive_strategy = "fake"
+  )
+
+  list(sch = sch, fake = fake, bundle = b2)
+}, error = function(e) { ok <<- FALSE; msg <<- conditionMessage(e); NULL })
+
+if (!ok) {
+  cat("DB example skipped during vignette build:", msg, "\n")
+} else {
+  str(out$fake$hired_at)     # show it's POSIXct
+  out$bundle$schema_path
+  out$bundle$data_paths$csv
+}
+
+```
+
+

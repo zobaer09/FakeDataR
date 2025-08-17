@@ -13,7 +13,10 @@ generate_fake_data(
   custom_levels = NULL,
   custom_names = NULL,
   seed = NULL,
-  verbose = FALSE
+  verbose = FALSE,
+  sensitive = NULL,
+  sensitive_detect = TRUE,
+  sensitive_strategy = c("fake", "drop")
 )
 }
 \arguments{
@@ -21,8 +24,7 @@ generate_fake_data(
 
 \item{n}{Number of rows to generate. Default 30.}
 
-\item{category_mode}{How to handle categorical variables:
-"preserve", "generic", or "custom".}
+\item{category_mode}{How to handle categorical variables: "preserve", "generic", or "custom".}
 
 \item{numeric_mode}{How to generate numeric data: "range" or "distribution".}
 
@@ -32,9 +34,19 @@ generate_fake_data(
 
 \item{custom_names}{Character vector of custom column names (used if column_mode="custom").}
 
-\item{seed}{Optional integer seed for reproducible output. Default NULL.}
+\item{seed}{Optional integer seed for reproducibility. Default NULL.}
 
-\item{verbose}{Logical; if TRUE, prints detected column metadata. Default FALSE.}
+\item{verbose}{Logical; if TRUE, prints detected column metadata & sensitive columns.}
+
+\item{sensitive}{Character vector of column names to always treat as sensitive;
+these will be faked with special generators (or dropped if strategy = "drop").
+If NULL, uses detection rules below.}
+
+\item{sensitive_detect}{Logical; if TRUE, detect sensitive columns by name
+using built-in regex (id/email/phone). Default TRUE.}
+
+\item{sensitive_strategy}{"fake" (default) or "drop". If "drop", sensitive columns
+are removed from the output.}
 }
 \value{
 A data.frame of fake data with \code{n} rows.

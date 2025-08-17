@@ -2,9 +2,13 @@
 
 export(export_fake)
 export(generate_fake_data)
+export(generate_fake_from_schema)
+export(generate_fake_posixct_column)
 export(generate_fake_with_privacy)
 export(generate_llm_prompt)
 export(llm_bundle)
+export(llm_bundle_from_db)
+export(schema_from_db)
 export(validate_fake)
 export(zip_llm_bundle)
 importFrom(stats,model.frame)
