@@ -133,7 +133,7 @@ llm_bundle <- function(
     readme_path <- file.path(path, prompt_filename)
     
     lines <- c(
-      sprintf("# Fake bundle for LLM - %s", filename),
+      sprintf("# Fake bundle for LLM \u2014 %s", filename),
       "",
       "This bundle contains:",
       paste0("- Data files: ", paste(file.path(path, paste0(filename, ".", formats)), collapse = ", ")),
