@@ -27,17 +27,17 @@ generate_fake_with_privacy(
 
 \item{seed}{optional seed}
 
-\item{sensitive}{Character vector of column names that are sensitive (optional).}
+\item{category_mode, numeric_mode, column_mode}{Optional overrides passed to \code{\link[=generate_fake_data]{generate_fake_data()}}.}
 
-\item{sensitive_detect}{Logical, auto-detect obvious IDs/emails/phones? Default TRUE.}
+\item{sensitive}{Character vector of original column names treated as sensitive.}
 
-\item{sensitive_strategy}{One of "fake", "drop", "blank".}
+\item{sensitive_detect}{Logical; detect common sensitive columns by name (id/email/phone).}
+
+\item{sensitive_strategy}{One of \code{"fake"} or \code{"drop"}.}
 }
 \value{
-data.frame with attributes: sensitive_columns, dropped_columns, name_map
+A data.frame with attributes like \code{name_map}, \code{dropped_columns}, \code{sensitive_columns}.
 }
 \description{
-Generate fake data with privacy controls
-
-Generate fake data using a privacy preset
+Thin wrapper over \code{\link[=generate_fake_data]{generate_fake_data()}} that forwards privacy options.
 }
