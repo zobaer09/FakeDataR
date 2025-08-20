@@ -27,11 +27,11 @@ generate_fake_with_privacy(
 
 \item{seed}{optional seed}
 
-\item{sensitive}{Character vector of column names to treat as sensitive}
+\item{sensitive}{Character vector of column names that are sensitive (optional).}
 
-\item{sensitive_detect}{Logical, auto-detect common sensitive names (id/email/phone/...)}
+\item{sensitive_detect}{Logical, auto-detect obvious IDs/emails/phones? Default TRUE.}
 
-\item{sensitive_strategy}{One of "fake" or "drop"}
+\item{sensitive_strategy}{One of "fake", "drop", "blank".}
 }
 \value{
 data.frame with attributes: sensitive_columns, dropped_columns, name_map

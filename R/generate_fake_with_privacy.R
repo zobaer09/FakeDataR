@@ -4,18 +4,19 @@
 #' @param n Rows to generate
 #' @param level One of "low","medium","high" (reserved for future tuning)
 #' @param seed Optional RNG seed
-#' @param sensitive Character vector of column names to treat as sensitive
-#' @param sensitive_detect Logical, auto-detect common sensitive names (id/email/phone/...)
-#' @param sensitive_strategy One of "fake" or "drop"
+#' @param sensitive Character vector of column names that are sensitive (optional).
+#' @param sensitive_detect Logical, auto-detect obvious IDs/emails/phones? Default TRUE.
+#' @param sensitive_strategy One of "fake", "drop", "blank".
 #' @return data.frame with attributes: sensitive_columns, dropped_columns, name_map
 #' @export
 generate_fake_with_privacy <- function(
-    data, n = 30,
-    level = c("medium","low","high"),
+    data,
+    n = NULL,
+    level = 0.05,
     seed = NULL,
     sensitive = NULL,
     sensitive_detect = TRUE,
-    sensitive_strategy = c("fake","drop")
+    sensitive_strategy = c("fake", "drop", "blank")
 ) {
   level <- match.arg(level)
   sensitive_strategy <- match.arg(sensitive_strategy)
