@@ -1,14 +1,7 @@
-#' Fallback operator
-#'
-#' Returns `lhs` if not `NULL`, otherwise `rhs`.
-#'
-#' @name or_or
-#' @aliases %||%
-#' @usage lhs %||% rhs
+# Internal helper(s) — not exported
 #' @keywords internal
-NULL
+#' @noRd
 
-#' @rdname or_or
-#' @export
-`%||%` <- function(lhs, rhs) if (is.null(lhs)) rhs else lhs
+# Fallback operator: return `y` when `x` is NULL, otherwise `x`.
+`%||%` <- function(x, y) if (is.null(x)) y else x
 
