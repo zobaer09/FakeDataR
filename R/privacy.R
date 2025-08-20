@@ -1,11 +1,8 @@
-#' Generate fake data using a privacy preset
-#'
-#' @param data data.frame
-#' @param n rows
-#' @param level 'low' | 'medium' | 'high'
-#' @param seed optional seed
-#' @export
-generate_fake_with_privacy <- function(data, n = 30, level = c("low","medium","high"), seed = NULL) {
+# R/privacy.R
+
+#' @keywords internal
+#' @noRd
+.generate_fake_with_preset <- function(data, n = 30, level = c("low","medium","high"), seed = NULL) {
   level <- match.arg(level)
   cfg <- switch(level,
                 low    = list(category_mode = "preserve", column_mode = "keep",    numeric_mode = "range"),
