@@ -17,29 +17,34 @@ generate_fake_with_privacy(
 \arguments{
 \item{data}{A data.frame (or coercible) to mirror.}
 
-\item{n}{Number of rows to generate (default: same as \code{data} if NULL).}
+\item{n}{Number of rows to generate (default: same as \code{nrow(data)} if \code{NULL}).}
 
-\item{level}{Privacy level: one of "low", "medium", "high". This influences
-fallback modes if a plain faker is used.}
+\item{level}{Privacy preset: one of \code{"low"}, \code{"medium"}, \code{"high"}.
+Your faker settings (e.g., how categories/numerics are mirrored) will use
+stricter defaults at higher levels.}
 
 \item{seed}{Optional RNG seed for reproducibility.}
 
-\item{sensitive}{Optional character vector of column names to treat as sensitive.}
+\item{sensitive}{Optional character vector of \strong{original} column names to
+treat as sensitive.}
 
-\item{sensitive_detect}{Logical, auto-detect common sensitive columns
-(id/email/phone) by name. Default TRUE.}
+\item{sensitive_detect}{Logical; auto-detect common sensitive columns
+(id/email/phone/name/address/etc.) from the \strong{original} names. Default \code{TRUE}.}
 
-\item{sensitive_strategy}{One of "fake" (replace with realistic tokens) or "drop".}
+\item{sensitive_strategy}{One of \code{"fake"} (replace with realistic tokens) or
+\code{"drop"} (remove those columns). Default \code{"fake"}.}
 }
 \value{
-A data.frame with attributes:
+A \code{data.frame} with attributes:
 \itemize{
-\item \code{sensitive_columns} (chr)
-\item \code{dropped_columns} (chr)
-\item \code{name_map} (named chr: original -> output)
+\item \code{sensitive_columns} (chr; original names)
+\item \code{dropped_columns} (chr; original names that were dropped)
+\item \code{name_map} (named chr; original -> output)
 }
 }
 \description{
-Creates a fake dataset mirroring the input, with options to detect/handle
-sensitive columns (IDs, emails, phones, etc.).
+Generates a synthetic copy of \code{data}, then optionally detects/handles
+sensitive columns by name. Detection is done on the \strong{original column names}
+and then mapped to the output names via \code{attr(fake, "name_map")} if present,
+so it still works even if your faker renames columns.
 }
