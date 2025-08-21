@@ -1,14 +1,16 @@
 Package: FakeDataR
 Title: Privacy-Preserving Synthetic Data for LLM Workflows
-Version: 0.0.0.9000
-Authors@R: 
-    person("Zobaer", "Ahmed", , "you@email.com", role = c("aut", "cre"))
+Version: 0.1.0
+Authors@R:
+    person(given = "Zobaer", family = "Ahmed",
+           email = "zunnun09@gmail.com",
+           role = c("aut","cre"))
 Description: Generate privacy-preserving synthetic datasets that mirror
-    structure, types, levels, and missingness; export LLM-ready bundles
+    structure, types, factor levels, and missingness; export LLM-ready bundles
     (data + JSON schema + README); and build fake data directly from SQL
     schemas without reading real rows.
 License: MIT + file LICENSE
-URL: https://zobaer09.github.io/FakeDataR/
+URL: https://zobaer09.github.io/FakeDataR/, https://github.com/zobaer09/FakeDataR
 BugReports: https://github.com/zobaer09/FakeDataR/issues
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
@@ -28,6 +30,5 @@ Suggests:
     palmerpenguins,
     gapminder,
     arrow
-VignetteBuilder: knitr
+VignetteBuilder: knitr, rmarkdown
 Config/testthat/edition: 3
-
