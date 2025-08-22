@@ -11,40 +11,34 @@ generate_fake_with_privacy(
   seed = NULL,
   sensitive = NULL,
   sensitive_detect = TRUE,
-  sensitive_strategy = c("fake", "drop")
+  sensitive_strategy = c("fake", "drop"),
+  normalize = TRUE
 )
 }
 \arguments{
 \item{data}{A data.frame (or coercible) to mirror.}
 
-\item{n}{Number of rows to generate (default: same as \code{nrow(data)} if \code{NULL}).}
+\item{n}{Number of rows to generate (default: same as \code{nrow(data)} if NULL).}
 
-\item{level}{Privacy preset: one of \code{"low"}, \code{"medium"}, \code{"high"}.
-Your faker settings (e.g., how categories/numerics are mirrored) will use
-stricter defaults at higher levels.}
+\item{level}{Privacy preset: one of "low", "medium", "high".}
 
 \item{seed}{Optional RNG seed for reproducibility.}
 
-\item{sensitive}{Optional character vector of \strong{original} column names to
-treat as sensitive.}
+\item{sensitive}{Optional character vector of original column names to treat as sensitive.}
 
-\item{sensitive_detect}{Logical; auto-detect common sensitive columns
-(id/email/phone/name/address/etc.) from the \strong{original} names. Default \code{TRUE}.}
+\item{sensitive_detect}{Logical; auto-detect common sensitive columns by name. Default TRUE.}
 
-\item{sensitive_strategy}{One of \code{"fake"} (replace with realistic tokens) or
-\code{"drop"} (remove those columns). Default \code{"fake"}.}
+\item{sensitive_strategy}{One of "fake" (replace with tokens) or "drop". Default "fake".}
+
+\item{normalize}{If TRUE (default), coerce & normalize inputs (percent → numeric,
+mm/dd/yyyy HH:MM → POSIXct, yes/no → factor, blanks → NA; preserves
+"not applicable"/"no data" as real categories).}
 }
 \value{
-A \code{data.frame} with attributes:
-\itemize{
-\item \code{sensitive_columns} (chr; original names)
-\item \code{dropped_columns} (chr; original names that were dropped)
-\item \code{name_map} (named chr; original -> output)
-}
+data.frame with attributes: sensitive_columns, dropped_columns, name_map
 }
 \description{
 Generates a synthetic copy of \code{data}, then optionally detects/handles
-sensitive columns by name. Detection is done on the \strong{original column names}
-and then mapped to the output names via \code{attr(fake, "name_map")} if present,
-so it still works even if your faker renames columns.
+sensitive columns by name. Detection uses the ORIGINAL column names and
+maps to output via \code{attr(fake, "name_map")} if present.
 }

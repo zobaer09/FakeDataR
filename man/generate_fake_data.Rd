@@ -16,7 +16,8 @@ generate_fake_data(
   verbose = FALSE,
   sensitive = NULL,
   sensitive_detect = TRUE,
-  sensitive_strategy = c("fake", "drop")
+  sensitive_strategy = c("fake", "drop"),
+  normalize = TRUE
 )
 }
 \arguments{
@@ -47,6 +48,8 @@ using built-in regex (id/email/phone). Default TRUE.}
 
 \item{sensitive_strategy}{"fake" (default) or "drop". If "drop", sensitive columns
 are removed from the output.}
+
+\item{normalize}{If TRUE (default), coerce & normalize inputs (percent → numeric, mm/dd/yyyy HH:MM → POSIXct, yes/no → factor, blanks → NA; preserves, "not applicable"/"no data" as categories).}
 }
 \value{
 A data.frame of fake data with \code{n} rows.

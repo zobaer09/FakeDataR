@@ -2,17 +2,49 @@
 % Please edit documentation in R/prepare_input_data.R
 \name{prepare_input_data}
 \alias{prepare_input_data}
-\title{Prepare Input Data: Coerce to data.frame}
+\title{Prepare Input Data: Coerce to data.frame and (optionally) normalize values}
 \usage{
-prepare_input_data(data)
+prepare_input_data(
+  data,
+  normalize = TRUE,
+  na_strings = c("", "NA", "N/A", "na", "No data", "no data"),
+  keep_as_levels = c("not applicable", "prefer not to answer", "unsure"),
+  percent_detect_threshold = 0.6,
+  datetime_formats = c("\%m/\%d/\%Y \%H:\%M:\%S", "\%m/\%d/\%Y \%H:\%M",
+    "\%Y-\%m-\%d \%H:\%M:\%S", "\%Y-\%m-\%d \%H:\%M", "\%Y-\%m-\%dT\%H:\%M:\%S",
+    "\%Y-\%m-\%dT\%H:\%M", "\%m/\%d/\%Y", "\%Y-\%m-\%d")
+)
 }
 \arguments{
-\item{data}{Input object}
+\item{data}{An object coercible to \code{data.frame} (data.frame/tibble/data.table/matrix/list, etc.)}
+
+\item{normalize}{Logical, run value normalization step (default \code{TRUE}).}
+
+\item{na_strings}{Character vector that should become \code{NA}
+(default: \code{c("", "NA", "N/A", "na", "No data", "no data")}).}
+
+\item{keep_as_levels}{Character vector that should be \strong{kept as values} (not \code{NA}),
+e.g., survey choices (default: \code{c("not applicable", "prefer not to answer", "unsure")}).
+Matching is case-insensitive.}
+
+\item{percent_detect_threshold}{Proportion of non-missing values that must contain \verb{\%}
+before converting a character column to numeric (default \code{0.6}).}
+
+\item{datetime_formats}{Candidate formats tried (in order) when parsing date/time strings.
+The best-fitting format (most successful parses) is used. Defaults cover
+\verb{mm/dd/yyyy HH:MM(:SS)?}, ISO-8601, and date-only.}
 }
 \value{
-A data.frame or error
+A base \code{data.frame}.
 }
 \description{
-Takes any common tabular R object and safely converts to data.frame.
-Returns NULL or error if unsupported.
+Converts common tabular objects to a base \code{data.frame}, and if \code{normalize = TRUE}
+it applies light, conservative value normalization:
+\itemize{
+\item Converts common date/time strings to POSIXct (best-effort across several formats)
+\item Converts percent-like character columns (e.g. "85\%") to numeric (85)
+\item Maps a configurable set of "NA-ish" strings to \code{NA}, while \emph{keeping} common survey
+responses like "not applicable" or "prefer not to answer" as \strong{real levels}
+\item Normalizes yes/no character columns to an ordered factor \code{c("no","yes")}
+}
 }
