@@ -58,7 +58,8 @@ existing dataset (types, factor levels, NA/blank rates). Values are fake.</p>
 <span>  verbose <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  sensitive <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  sensitive_detect <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  sensitive_strategy <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"fake"</span>, <span class="st">"drop"</span><span class="op">)</span></span>
+<span>  sensitive_strategy <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"fake"</span>, <span class="st">"drop"</span><span class="op">)</span>,</span>
+<span>  normalize <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -116,6 +117,10 @@ using built-in regex (id/email/phone). Default TRUE.</p></dd>
 <dt id="arg-sensitive-strategy">sensitive_strategy<a class="anchor" aria-label="anchor" href="#arg-sensitive-strategy"></a></dt>
 <dd><p>"fake" (default) or "drop". If "drop", sensitive columns
 are removed from the output.</p></dd>
+
+
+<dt id="arg-normalize">normalize<a class="anchor" aria-label="anchor" href="#arg-normalize"></a></dt>
+<dd><p>If TRUE (default), coerce &amp; normalize inputs (percent → numeric, mm/dd/yyyy HH:MM → POSIXct, yes/no → factor, blanks → NA; preserves, "not applicable"/"no data" as categories).</p></dd>
 
 </dl></div>
     <div class="section level2">
