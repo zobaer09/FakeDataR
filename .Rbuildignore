@@ -13,3 +13,10 @@
 ^revdep$
 
 ^inst/WORDLIST$
+
+^local_training_demo\.R$
+^local_smoke_test\.R$
+^scripts/local_.*\.R$
+^FakeDataR_training_.*/$
+^demo_from_.*
+^.*\.sqlite$

@@ -1,126 +1,104 @@
 #' Generate fake data with privacy controls
 #'
 #' Generates a synthetic copy of `data`, then optionally detects/handles
-#' sensitive columns by name. Detection is done on the **original column names**
-#' and then mapped to the output names via `attr(fake, "name_map")` if present,
-#' so it still works even if your faker renames columns.
+#' sensitive columns by name. Detection uses the ORIGINAL column names and
+#' maps to output via `attr(fake, "name_map")` if present.
 #'
 #' @param data A data.frame (or coercible) to mirror.
-#' @param n Number of rows to generate (default: same as `nrow(data)` if `NULL`).
-#' @param level Privacy preset: one of `"low"`, `"medium"`, `"high"`.
-#'   Your faker settings (e.g., how categories/numerics are mirrored) will use
-#'   stricter defaults at higher levels.
+#' @param n Number of rows to generate (default: same as `nrow(data)` if NULL).
+#' @param level Privacy preset: one of "low", "medium", "high".
 #' @param seed Optional RNG seed for reproducibility.
-#' @param sensitive Optional character vector of **original** column names to
-#'   treat as sensitive.
-#' @param sensitive_detect Logical; auto-detect common sensitive columns
-#'   (id/email/phone/name/address/etc.) from the **original** names. Default `TRUE`.
-#' @param sensitive_strategy One of `"fake"` (replace with realistic tokens) or
-#'   `"drop"` (remove those columns). Default `"fake"`.
+#' @param sensitive Optional character vector of original column names to treat as sensitive.
+#' @param sensitive_detect Logical; auto-detect common sensitive columns by name. Default TRUE.
+#' @param sensitive_strategy One of "fake" (replace with tokens) or "drop". Default "fake".
+#' @param normalize If TRUE (default), coerce & normalize inputs (percent → numeric,
+#'   mm/dd/yyyy HH:MM → POSIXct, yes/no → factor, blanks → NA; preserves
+#'   "not applicable"/"no data" as real categories).
 #'
-#' @return A `data.frame` with attributes:
-#'   - `sensitive_columns` (chr; original names)
-#'   - `dropped_columns` (chr; original names that were dropped)
-#'   - `name_map` (named chr; original -> output)
+#' @return data.frame with attributes: sensitive_columns, dropped_columns, name_map
 #' @export
 generate_fake_with_privacy <- function(
     data,
     n = NULL,
-    level = c("low", "medium", "high"),
+    level = c("low","medium","high"),
     seed = NULL,
     sensitive = NULL,
     sensitive_detect = TRUE,
-    sensitive_strategy = c("fake", "drop")
+    sensitive_strategy = c("fake","drop"),
+    normalize = TRUE
 ) {
   level <- match.arg(level)
   sensitive_strategy <- match.arg(sensitive_strategy)
-  
   if (!is.null(seed)) set.seed(seed)
-  if (is.null(n)) n <- NROW(data)
   
-  # --- Build base fake according to preset (your package already provides this) ---
-  # Ensures attr(fake, "name_map") exists; if not, we create identity mapping.
-  fake <- .generate_fake_with_preset(data, n = n, level = level, seed = seed)
+  # Normalize first (or just coerce)
+  data_norm <- prepare_input_data(data)
+  if (isTRUE(normalize)) data_norm <- .normalize_input(data_norm)
   
-  # Ensure we have a name map original -> output (identity if your faker kept names)
-  name_map <- attr(fake, "name_map")
-  if (is.null(name_map)) {
-    name_map <- stats::setNames(names(fake), names(data))
-    # If dimensions mismatch, fall back to 1:1 on fake
-    if (length(name_map) != length(names(data))) {
-      name_map <- stats::setNames(names(fake), names(fake))
-    }
-    attr(fake, "name_map") <- name_map
-  }
+  # Base fake with original names kept (so we can match sensitive by original name)
+  # We ask the base faker to KEEP names (column_mode="keep") for low/medium presets.
+  cfg <- switch(level,
+                low    = list(category_mode = "preserve", column_mode = "keep",    numeric_mode = "range"),
+                medium = list(category_mode = "generic",  column_mode = "generic", numeric_mode = "range"),
+                high   = list(category_mode = "generic",  column_mode = "generic", numeric_mode = "distribution")
+  )
   
-  # --- Figure out sensitive ORIGINAL columns ---
-  orig_names <- names(data)
-  sens_user  <- sensitive %||% character(0)
+  fake <- do.call(
+    generate_fake_data,
+    c(list(data = data_norm, n = n, seed = seed, normalize = FALSE), cfg)
+  )
   
+  # ensure name_map exists (original -> output)
+  attr(fake, "name_map") <- attr(fake, "name_map") %||% stats::setNames(names(fake), names(fake))
+  
+  # ----- Privacy handling ------------------------------------------------------
   detect_rx <- "(?i)(^id$|email|e-mail|phone|tel|mobile|ssn|sin|passport|iban|account|card|name$|address)"
-  sens_auto <- if (isTRUE(sensitive_detect)) orig_names[grepl(detect_rx, orig_names)] else character(0)
+  sens_auto <- if (isTRUE(sensitive_detect)) {
+    orig_names <- names(prepare_input_data(data))  # original names before normalization
+    orig_names[grepl(detect_rx, orig_names)]
+  } else character(0)
   
-  sens_orig <- unique(c(sens_user, sens_auto))
-  sens_orig <- sens_orig[sens_orig %in% names(name_map)]
+  sens_cols <- union(sensitive %||% character(0), sens_auto)
+  dropped   <- character(0)
   
-  # Map to OUTPUT names present in the fake
-  sens_out <- unname(name_map[sens_orig])
-  sens_out <- unique(stats::na.omit(sens_out))
-  sens_out <- sens_out[sens_out %in% names(fake)]
-  
-  dropped <- character(0)
-  
-  if (length(sens_out)) {
-    if (identical(sensitive_strategy, "drop")) {
-      fake <- fake[, setdiff(names(fake), sens_out), drop = FALSE]
-      dropped <- sens_orig
-    } else {
-      # Replace with fake-like tokens; preserve NA pattern
-      for (nm in sens_out) {
-        v  <- fake[[nm]]
+  if (length(sens_cols)) {
+    if (sensitive_strategy == "drop") {
+      keep_out <- setdiff(names(fake), unname(attr(fake, "name_map")[sens_cols]))
+      fake <- fake[, keep_out, drop = FALSE]
+      dropped <- sens_cols
+    } else { # "fake" tokens, preserving NA-pattern
+      out_map <- attr(fake, "name_map")
+      for (orig_nm in sens_cols) {
+        out_nm <- unname(out_map[orig_nm])
+        if (is.na(out_nm) || !nzchar(out_nm) || !(out_nm %in% names(fake))) next
+        v  <- fake[[out_nm]]
         na <- is.na(v)
         
-        # Pick a replacement strategy based on name/type
-        if (grepl("email", nm, ignore.case = TRUE)) {
-          repl <- paste0("user",
-                         sample(100000:999999, length(v), TRUE),
-                         "@example.",
-                         sample(c("com", "org", "net"), length(v), TRUE))
-        } else if (grepl("phone|tel|mobile", nm, ignore.case = TRUE)) {
-          repl <- vapply(seq_along(v), function(i) {
-            paste0("+1-",
-                   paste0(sample(0:9, 3, TRUE), collapse = ""), "-",
-                   paste0(sample(0:9, 3, TRUE), collapse = ""), "-",
-                   paste0(sample(0:9, 4, TRUE), collapse = ""))
+        if (grepl("email", orig_nm, ignore.case = TRUE)) {
+          v <- paste0("user", sample(100000:999999, length(v), TRUE),
+                      "@example.", sample(c("com","org","net"), length(v), TRUE))
+        } else if (grepl("phone|tel|mobile", orig_nm, ignore.case = TRUE)) {
+          v <- vapply(seq_along(v), function(i) {
+            paste0("+1-", paste0(sample(0:9,3,TRUE),collapse = ""), "-",
+                   paste0(sample(0:9,3,TRUE),collapse = ""), "-",
+                   paste0(sample(0:9,4,TRUE),collapse = ""))
           }, character(1))
-        } else if (grepl("^id$", nm, ignore.case = TRUE) || is.integer(v)) {
-          repl <- as.integer(sample(1000:9999, length(v), TRUE))
-        } else if (grepl("name", nm, ignore.case = TRUE)) {
+        } else if (grepl("^id$", orig_nm, ignore.case = TRUE)) {
+          v <- as.integer(sample(1000:9999, length(v), TRUE))
+        } else if (grepl("name", orig_nm, ignore.case = TRUE)) {
           pool <- c("Alex","Sam","Jordan","Taylor","Casey","Devon","Riley","Jamie")
-          repl <- sample(pool, length(v), TRUE)
-        } else if (is.numeric(v)) {
-          # numeric: keep scale roughness
-          m <- stats::median(v, na.rm = TRUE)
-          s <- stats::mad(v, constant = 1, na.rm = TRUE)
-          s <- ifelse(is.finite(s) && s > 0, s, abs(m) + 1)
-          repl <- rnorm(length(v), mean = m, sd = s)
-          # coerce back to integer if original was integer
-          if (is.integer(v)) repl <- as.integer(round(repl))
+          v <- sample(pool, length(v), TRUE)
         } else {
-          # generic token
-          repl <- vapply(seq_along(v), function(i) {
-            paste0(sample(letters, 8, TRUE), collapse = "")
-          }, character(1))
+          v <- vapply(seq_along(v), function(i) paste0(sample(letters, 8, TRUE), collapse = ""), character(1))
         }
         
-        repl[na] <- NA
-        fake[[nm]] <- repl
+        v[na] <- NA
+        fake[[out_nm]] <- v
       }
     }
   }
   
-  attr(fake, "sensitive_columns") <- sens_orig
+  attr(fake, "sensitive_columns") <- sens_cols
   attr(fake, "dropped_columns")   <- dropped
-  
   fake
 }

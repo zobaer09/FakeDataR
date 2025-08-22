@@ -7,3 +7,14 @@ inst/doc
 .httr-oauth
 .DS_Store
 .quarto
+
+
+# Local training/smoke scripts (keep only on your machine)
+local_training_demo.R
+local_smoke_test.R
+scripts/local_*.R
+
+# Outputs produced by the demo
+FakeDataR_training_*/
+demo_from_*        # any bundle files starting with demo_from_
+*.sqlite           # temp SQLite DBs if you create any

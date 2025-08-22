@@ -12,6 +12,7 @@
 #' @param custom_levels Named list of custom levels (used if category_mode="custom").
 #' @param custom_names Character vector of custom column names (used if column_mode="custom").
 #' @param seed Optional integer seed for reproducibility. Default NULL.
+#' @param normalize If TRUE (default), coerce & normalize inputs (percent → numeric, mm/dd/yyyy HH:MM → POSIXct, yes/no → factor, blanks → NA; preserves, "not applicable"/"no data" as categories).
 #' @param verbose Logical; if TRUE, prints detected column metadata & sensitive columns.
 #'
 #' @param sensitive Character vector of column names to always treat as sensitive;
@@ -37,8 +38,15 @@ generate_fake_data <- function(
     verbose = FALSE,
     sensitive = NULL,
     sensitive_detect = TRUE,
-    sensitive_strategy = c("fake","drop")
+    sensitive_strategy = c("fake","drop"),
+    normalize = TRUE
 ) {
+  # Input prep
+  data <- prepare_input_data(data)
+  if (isTRUE(normalize)) {
+    data <- .normalize_input(data)
+  }
+  
   category_mode <- match.arg(category_mode)
   numeric_mode  <- match.arg(numeric_mode)
   column_mode   <- match.arg(column_mode)
