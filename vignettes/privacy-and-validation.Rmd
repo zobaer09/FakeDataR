@@ -1,0 +1,155 @@
+---
+title: "Privacy and validation"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Privacy and validation}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>", message = FALSE, warning = FALSE)
+set.seed(2)
+```
+
+## What the function does (Overview)
+
+`generate_fake_with_privacy()` creates a synthetic copy of your data.  
+It then handles sensitive columns by name.
+
+### Level presets
+
+| level  | category_mode | column_mode | numeric_mode |
+|-------:|:--------------|:------------|:-------------|
+| low    | preserve      | keep        | range        |
+| medium | generic       | generic     | range        |
+| high   | generic       | generic     | distribution |
+
+- `sensitive_detect` auto-finds common PII by column name.
+- `sensitive_strategy` chooses how to treat those columns: `"fake"` (tokenize) or `"drop"` (remove).
+- You can also list sensitive columns yourself with `sensitive = c("id","email", ...)`.
+
+
+## Levels and strategies
+
+```{r}
+library(FakeDataR)
+
+df <- data.frame(
+  id    = 1:50,
+  email = sprintf("u%02d@x.com", 1:50),
+  phone = sprintf("555-01%02d", 1:50),
+  dept  = sample(c("A","B","C"), 50, TRUE),
+  spend = round(runif(50, 10, 200), 2),
+  check.names = FALSE
+)
+
+
+# Auto-detect sensitive columns and fake them
+# Strategy: fake sensitive fields (default)
+fake_low <- generate_fake_with_privacy(
+  data = df, n = 60, level = "low", seed = 1,
+  sensitive_detect = TRUE, sensitive_strategy = "fake",
+  normalize = TRUE
+)
+
+# Auto-detect and drop sensitive columns
+# Strategy: drop sensitive fields
+fake_drop <- generate_fake_with_privacy(
+  data = df, n = 60, level = "medium", seed = 1,
+  sensitive_detect = TRUE, sensitive_strategy = "drop",
+  normalize = TRUE
+)
+
+names(fake_low)
+names(fake_drop)
+
+# Inspect privacy metadata
+attr(fake_low,  "sensitive_columns")
+attr(fake_drop, "dropped_columns")
+attr(fake_low,  "name_map")
+
+
+```
+
+## Explicit 'sensitive' vs auto-detect
+
+You can fully control what’s sensitive. Here we turn off auto-detect and list columns ourselves:
+
+```{r}
+fake_explicit <- generate_fake_with_privacy(
+  data = df, n = 60, seed = 1,
+  sensitive = c("id","email","phone"),
+  sensitive_detect = FALSE,
+  sensitive_strategy = "fake",
+  normalize = TRUE
+)
+names(fake_explicit)
+attr(fake_explicit, "sensitive_columns")
+
+
+```
+
+## Extending detection with your own patterns
+
+```{r}
+
+# A broad, configurable pattern set
+sensitive_patterns <- c(
+  # direct IDs / names
+  "^id$", "employee[_-]?id", "user(name|[_-]?id)?$", "full[_-]?name", "first[_-]?name", "last[_-]?name",
+  # contact
+  "email|e-mail", "phone|tel|mobile", "fax",
+  # address / geo
+  "address|street|road|avenue|apt|unit|suite|zip|postal|postcode|city|state|province|country",
+  "lat(itude)?|lon(gitude)?|gps",
+  # government IDs (international sampling)
+  "RegId|ssn|sin|nin|aadhaar|aadhar|bvn|curp|dni|ced(ul|)+a|cpf|pan\\b|tin\\b|ein\\b|pesel|nin\\b",
+  # licenses / travel docs
+  "passport|visa|license|licence|driver|dl\\b|vin|plate",
+  # finance / payments
+  "iban|swift|bic|routing|sort[_-]?code|account|acct|bank",
+  "credit|debit|card|cvv|cvc|pan[_-]?number",
+  # auth / secrets / device
+  "password|pass|pwd|pin|otp|secret|token|api[_-]?key|auth|bearer|session|cookie",
+  "ip(_address)?|mac(_address)?|imei|imsi|serial|device|udid|android[_-]?id|idfa|gaid",
+  # medical / patient
+  "mrn|nhs|medicare|medicaid|patient|diagnosis",
+  # birthdays
+  "dob|date[_-]?of[_-]?birth|birth(day|date)",
+  # education
+  "student[_-]?id"
+)
+
+rx <- paste0("(?i)(", paste(sensitive_patterns, collapse = "|"), ")")
+sens_cols <- names(df)[grepl(rx, names(df))]
+sens_cols
+
+sens_cols <- names(df)[grepl(rx, names(df))]
+fake_custom_detect <- generate_fake_with_privacy(
+  data = df, n = 60, seed = 1,
+  sensitive = unique(c(sens_cols, "email")),
+  sensitive_detect = FALSE,
+  sensitive_strategy = "fake",
+  normalize = TRUE
+)
+attr(fake_custom_detect, "sensitive_columns")
+
+```
+
+## Validation
+
+```{r}
+v1 <- validate_fake(df, fake_low)
+head(v1, 5)
+
+```
+
+
+
+
+
+
+
+
+

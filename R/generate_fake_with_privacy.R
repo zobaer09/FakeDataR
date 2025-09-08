@@ -14,17 +14,18 @@
 #' @param normalize If TRUE (default), coerce & normalize inputs (percent → numeric,
 #'   mm/dd/yyyy HH:MM → POSIXct, yes/no → factor, blanks → NA; preserves
 #'   "not applicable"/"no data" as real categories).
-#'
 #' @return data.frame with attributes: sensitive_columns, dropped_columns, name_map
 #' @export
 generate_fake_with_privacy <- function(
     data,
-    n = NULL,
+    n = 30,
     level = c("low","medium","high"),
     seed = NULL,
     sensitive = NULL,
     sensitive_detect = TRUE,
     sensitive_strategy = c("fake","drop"),
+    sensitive_patterns = NULL, 
+    sensitive_regex = NULL,
     normalize = TRUE
 ) {
   level <- match.arg(level)
@@ -50,14 +51,24 @@ generate_fake_with_privacy <- function(
   
   # ensure name_map exists (original -> output)
   attr(fake, "name_map") <- attr(fake, "name_map") %||% stats::setNames(names(fake), names(fake))
-  
+    
   # ----- Privacy handling ------------------------------------------------------
-  detect_rx <- "(?i)(^id$|email|e-mail|phone|tel|mobile|ssn|sin|passport|iban|account|card|name$|address)"
+  # detect_rx <- "(?i)(^id$|email|e-mail|phone|tel|mobile|ssn|sin|passport|iban|account|card|name$|address)"
+  # sens_auto <- if (isTRUE(sensitive_detect)) {
+  #   orig_names <- names(prepare_input_data(data))  # original names before normalization
+  #   orig_names[grepl(detect_rx, orig_names)]
+  # } else character(0)
+  
+  orig_names <- names(prepare_input_data(data))
   sens_auto <- if (isTRUE(sensitive_detect)) {
-    orig_names <- names(prepare_input_data(data))  # original names before normalization
-    orig_names[grepl(detect_rx, orig_names)]
+    detect_sensitive_columns(
+      orig_names,
+      extra_patterns = sensitive_patterns,
+      override_regex = sensitive_regex
+    )
   } else character(0)
   
+
   sens_cols <- union(sensitive %||% character(0), sens_auto)
   dropped   <- character(0)
   

@@ -21,40 +21,57 @@ generate_fake_data(
 )
 }
 \arguments{
-\item{data}{A data.frame-like object to mirror.}
+\item{data}{A tabular object; will be coerced via \code{prepare_input_data()}.}
 
-\item{n}{Number of rows to generate. Default 30.}
+\item{n}{Rows to generate (default 30).}
 
-\item{category_mode}{How to handle categorical variables: "preserve", "generic", or "custom".}
+\item{category_mode}{One of "preserve","generic","custom".
+\itemize{
+\item preserve: sample observed categories by empirical frequency (keeps factors)
+\item generic: replace categories with "Category A/B/..."
+\item custom: use \code{custom_levels[[colname]]} if provided
+}}
 
-\item{numeric_mode}{How to generate numeric data: "range" or "distribution".}
+\item{numeric_mode}{One of "range","distribution".
+\itemize{
+\item range: uniform between min/max (integers stay integer-like)
+\item distribution: sample observed values with replacement
+}}
 
-\item{column_mode}{Column names: "keep", "generic", or "custom".}
+\item{column_mode}{One of "keep","generic","custom".
+\itemize{
+\item keep: keep original column names
+\item generic: rename to var1..varP (mapping in attr(name_map))
+\item custom: use \code{custom_names} named vector (old -> new)
+}}
 
-\item{custom_levels}{Named list of custom levels (used if category_mode="custom").}
+\item{custom_levels}{optional named list of allowed levels per column (for
+\code{category_mode="custom"}).}
 
-\item{custom_names}{Character vector of custom column names (used if column_mode="custom").}
+\item{custom_names}{optional named character vector old->new (for
+\code{column_mode="custom"}).}
 
-\item{seed}{Optional integer seed for reproducibility. Default NULL.}
+\item{seed}{Optional RNG seed.}
 
-\item{verbose}{Logical; if TRUE, prints detected column metadata & sensitive columns.}
+\item{verbose}{Logical; print progress.}
 
-\item{sensitive}{Character vector of column names to always treat as sensitive;
-these will be faked with special generators (or dropped if strategy = "drop").
-If NULL, uses detection rules below.}
+\item{sensitive}{Optional character vector of original column names to treat as sensitive.}
 
-\item{sensitive_detect}{Logical; if TRUE, detect sensitive columns by name
-using built-in regex (id/email/phone). Default TRUE.}
+\item{sensitive_detect}{Logical; auto-detect common sensitive columns by name.}
 
-\item{sensitive_strategy}{"fake" (default) or "drop". If "drop", sensitive columns
-are removed from the output.}
+\item{sensitive_strategy}{One of "fake","drop". Only applied if any sensitive columns exist.}
 
-\item{normalize}{If TRUE (default), coerce & normalize inputs (percent → numeric, mm/dd/yyyy HH:MM → POSIXct, yes/no → factor, blanks → NA; preserves, "not applicable"/"no data" as categories).}
+\item{normalize}{Logical; lightly normalize inputs (trim, \%→numeric, short datetimes→POSIXct).}
 }
 \value{
-A data.frame of fake data with \code{n} rows.
+A data.frame of n rows with attributes:
+\itemize{
+\item \code{name_map} (named chr: original -> output)
+\item \code{column_mode} (chr)
+\item \code{sensitive_columns} (chr; original names)
+\item \code{dropped_columns} (chr; original names that were dropped)
+}
 }
 \description{
-Create a synthetic dataset that mirrors the structure and key patterns of an
-existing dataset (types, factor levels, NA/blank rates). Values are fake.
+Generate Fake Data from Real Dataset Structure
 }

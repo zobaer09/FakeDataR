@@ -16,6 +16,31 @@ This vignette shows how to mirror the structure of real data with fully syntheti
 
 ## Quick start
 
+```{r tiny-end-to-end}
+# tiny input with a few likely sensitive fields
+df <- data.frame(
+  id = sprintf("id%03d", 1:10),
+  email = paste0("a", 1:10, "@x.com"),
+  Progress = paste0(sample(80:100, 10, TRUE), "%"),
+  check.names = FALSE
+)
+
+orig <- prepare_input_data(df)
+
+fake_priv <- generate_fake_with_privacy(
+  data = orig, n = 10, level = "low", seed = 1,
+  sensitive = c("id", "email"),
+  sensitive_detect = TRUE,
+  sensitive_strategy = "fake",
+  normalize = TRUE
+)
+
+# quick validation sample
+head(validate_fake(orig, fake_priv), 5)
+
+```
+
+
 ```{r}
 library(FakeDataR)
 
@@ -59,22 +84,38 @@ range(fake_dt$when)
 
 ```
 
-## Public datasets (optional)
+## Public datasets - wrap in guards, trim sizes
 
 These chunks run only if the packages are installed.
 
-```{r}
-fl <- nycflights13::flights
-set.seed(10)
-fl_small <- fl[sample.int(nrow(fl), 5000), ]
-fake_fl <- generate_fake_data(fl_small, n = 2000, seed = 10, numeric_mode = "distribution")
-validate_fake(fl_small, fake_fl)
+```{r flights-demo, message=FALSE}
+
+if (requireNamespace("nycflights13", quietly = TRUE)) {
+  fl <- nycflights13::flights
+  set.seed(10)
+  fl_small <- fl[sample.int(nrow(fl), 2000), ]  # smaller
+  fake_fl <- generate_fake_data(
+    fl_small, n = 500, seed = 10,
+    numeric_mode = "distribution"
+  )
+  head(validate_fake(fl_small, fake_fl), 5)
+} else {
+  message("nycflights13 not installed - skipping.")
+}
 ```
 
-```{r}
-peng <- na.omit(palmerpenguins::penguins[, c("species","island","bill_length_mm","sex")])
-fake_peng <- generate_fake_data(peng, n = 600, seed = 11, category_mode = "preserve")
-validate_fake(peng, fake_peng)
+
+```{r penguins-demo, message=FALSE}
+if (requireNamespace("palmerpenguins", quietly = TRUE)) {
+  peng <- na.omit(palmerpenguins::penguins[, c("species","island","bill_length_mm","sex")])
+  fake_peng <- generate_fake_data(
+    peng, n = 400, seed = 11,
+    category_mode = "preserve"
+  )
+  head(validate_fake(peng, fake_peng), 5)
+} else {
+  message("palmerpenguins not installed - skipping.")
+}
 
 ```
 
@@ -88,7 +129,7 @@ if (requireNamespace("gapminder", quietly = TRUE)) {
   # Keep it light if you want: gm <- gm[sample.int(nrow(gm), 2000), ]
 
   fake_gm <- generate_fake_data(
-    gm, n = 1500, seed = 21,
+    gm, n = 800, seed = 21,
     numeric_mode = "distribution",  # nicer numeric spread
     category_mode = "preserve"      # keep factor levels
   )
@@ -146,9 +187,13 @@ b1$zip_path
 
 ## Parquet export (optional)
 
-```{r}
-fake_air <- generate_fake_data(airquality, n = 1000, seed = 20)
-export_fake(fake_air, file.path(tempdir(), "air.parquet"))
+```{r parquet-export, message=FALSE}
+if (requireNamespace("arrow", quietly = TRUE)) {
+  fake_air <- generate_fake_data(airquality, n = 400, seed = 20)
+  export_fake(fake_air, file.path(tempdir(), "air.parquet"))
+} else {
+  message("arrow not installed - skipping Parquet export.")
+}
 
 ```
 
@@ -161,7 +206,7 @@ identical(a1, a2)
 
 ```
 
-```{r}
+```{r big-benchmark, eval=FALSE}
 big <- data.frame(
   a = runif(2e5),
   b = sample(letters, 2e5, TRUE),

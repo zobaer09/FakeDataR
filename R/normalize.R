@@ -1,87 +1,99 @@
 # R/normalize.R
+# Internal helpers to lightly normalize input data before fakering.
+# No exports; available inside the package namespace.
 
 #' @keywords internal
 #' @noRd
 .normalize_input <- function(df) {
   stopifnot(is.data.frame(df))
+  out <- df
   
-  # Only true blanks / NA tokens -> NA. Keep "not applicable"/"no data" as categories.
-  to_na  <- c("", "NA", "N/A", "na", "null", "NULL")
+  # Keep "no data"/"not applicable" as literal categories, not NA
+  na_tokens <- c("", "NA", "N/A")
   
-  .is_yesno <- function(x) {
-    vals <- tolower(na.omit(unique(x)))
-    length(vals) > 0 && all(vals %in% c("yes","no"))
-  }
-  .looks_pct <- function(x) {
-    x <- x[!is.na(x)]
-    if (!length(x)) return(FALSE)
-    mean(grepl("%", x)) >= 0.6
-  }
-  .looks_mdy_hms <- function(x) {
-    rx <- "\\b\\d{1,2}/\\d{1,2}/\\d{2,4}\\s+\\d{1,2}:\\d{2}(:\\d{2})?\\b"
-    x <- x[!is.na(x)]
-    if (!length(x)) return(FALSE)
-    mean(grepl(rx, x)) >= 0.6
-  }
-  .parse_mdy_hms <- function(x) {
-    out <- suppressWarnings(strptime(x, "%m/%d/%Y %H:%M:%S", tz = "UTC"))
-    if (all(is.na(out))) {
-      out <- suppressWarnings(strptime(x, "%m/%d/%Y %H:%M", tz = "UTC"))
-    }
-    as.POSIXct(out, tz = "UTC")
-  }
-  
-  for (j in seq_along(df)) {
-    v <- df[[j]]
+  for (nm in names(out)) {
+    v <- out[[nm]]
     
-    # -------- NEW: Handle FACTORS by preserving class --------
-    if (is.factor(v)) {
-      # Optionally standardize yes/no levels but keep factor class
-      if (.is_yesno(levels(v))) {
-        df[[j]] <- factor(tolower(as.character(v)), levels = c("no","yes"))
-      } else {
-        # leave factor as-is (no character coercion)
-        df[[j]] <- v
-      }
-      next
-    }
-    
-    # Characters: apply full normalization
+    # Only touch character columns
     if (is.character(v)) {
-      # Normalize blanks/NA tokens
-      v[trimws(v) %in% to_na] <- NA_character_
+      v <- trimws(v)
+      v[v %in% na_tokens] <- NA_character_
       
-      # Standardize common text tokens BUT KEEP them as real categories
-      tok <- tolower(v)
-      v[tok %in% c("not applicable","n/a (not applicable)")] <- "not applicable"
-      v[tok %in% c("no data","nodata")] <- "no data"
+      # Percent-like -> numeric (drops the % and parses)
+      if (.looks_like_percent(v)) v <- .percent_to_numeric(v)
       
-      # yes/no -> ordered factor
-      if (.is_yesno(v)) {
-        df[[j]] <- factor(tolower(v), levels = c("no","yes"))
-        next
-      }
+      # Datetime-like -> POSIXct (US mm/dd/yyyy hh:mm[:ss], 60%+ match)
+      parsed_dt <- .maybe_parse_datetime(v)
+      if (!is.null(parsed_dt)) v <- parsed_dt
       
-      # percent -> numeric (0..100 scale)
-      if (.looks_pct(v)) {
-        df[[j]] <- suppressWarnings(as.numeric(gsub("%", "", v)))
-        next
-      }
-      
-      # datetime -> POSIXct (UTC)
-      if (.looks_mdy_hms(v)) {
-        df[[j]] <- .parse_mdy_hms(v)
-        next
-      }
-      
-      # else keep as character
-      df[[j]] <- v
-      next
+      # Yes/No -> factor(no, yes) when values are only yes/no (case-insensitive)
+      if (.looks_like_yesno(v)) v <- factor(tolower(v), levels = c("no", "yes"))
     }
     
-    # Other types: leave untouched
-    df[[j]] <- v
+    out[[nm]] <- v
+  }
+  out
+}
+
+# --- helpers -------------------------------------------------------------------
+
+#' @keywords internal
+#' @noRd
+.looks_like_percent <- function(x) {
+  if (!is.character(x)) return(FALSE)
+  s <- x[!is.na(x)]
+  if (!length(s)) return(FALSE)
+  rx <- "^\\s*\\d+(?:[\\.,]\\d+)?\\s*%\\s*$"
+  mean(grepl(rx, s)) >= 0.6
+}
+
+#' @keywords internal
+#' @noRd
+.percent_to_numeric <- function(x) {
+  # replace comma decimal to dot, strip %, then as.numeric
+  y <- gsub(",", ".", x)
+  y <- gsub("%", "", y, fixed = TRUE)
+  suppressWarnings(as.numeric(y))
+}
+
+#' @keywords internal
+#' @noRd
+.looks_like_yesno <- function(x) {
+  if (!is.character(x)) return(FALSE)
+  s <- tolower(x[!is.na(x)])
+  if (!length(s)) return(FALSE)
+  uniq <- unique(s)
+  all(uniq %in% c("yes", "no")) && length(uniq) <= 2
+}
+
+#' @keywords internal
+#' @noRd
+.maybe_parse_datetime <- function(x) {
+  # Only try if strings look like mm/dd/yyyy hh:mm(:ss) for at least 60%
+  if (!is.character(x)) return(NULL)
+  s <- x[!is.na(x)]
+  if (!length(s)) return(NULL)
+  
+  looks_dt <- grepl("^\\s*\\d{1,2}/\\d{1,2}/\\d{2,4}\\s+\\d{1,2}:\\d{2}(?::\\d{2})?\\s*$",
+                    s, perl = TRUE)
+  if (mean(looks_dt) < 0.6) return(NULL)
+  
+  fmts <- c(
+    "%m/%d/%Y %H:%M:%S",
+    "%m/%d/%Y %H:%M",
+    "%m/%d/%y %H:%M:%S",
+    "%m/%d/%y %H:%M"
+  )
+  
+  for (fmt in fmts) {
+    suppressWarnings({
+      tt <- strptime(x, format = fmt, tz = "UTC")
+      out <- as.POSIXct(tt)
+    })
+    ok <- mean(!is.na(out))
+    if (!is.na(ok) && ok >= 0.6) return(out)
   }
   
-  df
+  NULL
 }
+

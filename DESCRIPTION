@@ -2,7 +2,7 @@ Package: FakeDataR
 Title: Privacy-Preserving Synthetic Data for LLM Workflows
 Version: 0.1.0
 Authors@R:
-    person(given = "Zobaer", family = "Ahmed",
+    person(given = "Zobaer", family = "Ahmed, PhD",
            email = "zunnun09@gmail.com",
            role = c("aut","cre"))
 Description: Generate privacy-preserving synthetic datasets that mirror

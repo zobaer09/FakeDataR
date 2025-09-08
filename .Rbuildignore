@@ -2,21 +2,32 @@
 ^\.Rproj\.user$
 ^LICENSE\.md$
 ^README\.Rmd$
+^README_files$
 ^_pkgdown\.yml$
-^docs$
 ^pkgdown$
+^docs$                 
 ^doc$
 ^Meta$
 ^\.github$
 ^cran-comments\.md$
 ^CRAN-SUBMISSION$
 ^revdep$
-
 ^inst/WORDLIST$
 
+# local scripts & outputs
 ^local_training_demo\.R$
 ^local_smoke_test\.R$
-^scripts/local_.*\.R$
+^scripts/.*$
 ^FakeDataR_training_.*/$
 ^demo_from_.*
 ^.*\.sqlite$
+
+# common scratch
+^data-raw$
+^tmp$|^temp$|^sandbox$|^scratch$
+^\.vscode$|^\.idea$
+^.*\.(Rhistory|RData)$
+
+^scripts/.*\.R$
+^tools/.*$
+^package_inventory_new\.csv$

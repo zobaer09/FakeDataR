@@ -4,16 +4,33 @@
 \alias{generate_fake_posixct_column}
 \title{Generate a Fake POSIXct Column}
 \usage{
-generate_fake_posixct_column(col, n)
+generate_fake_posixct_column(
+  like = NULL,
+  n = NULL,
+  start = NULL,
+  end = NULL,
+  tz = "UTC",
+  na_prop = NULL
+)
 }
 \arguments{
-\item{col}{POSIXct vector to mimic.}
+\item{like}{Optional POSIXct vector to mimic. If supplied, \code{n} defaults to \code{length(like)},
+the output range matches \code{range(like, na.rm = TRUE)}, and the NA rate is copied unless
+you override with \code{na_prop}.}
 
-\item{n}{Number of rows.}
+\item{n}{Number of rows to generate. Required when \code{like} is \code{NULL}.}
+
+\item{start, end}{Optional POSIXct bounds to sample between when \code{like} is \code{NULL}.}
+
+\item{tz}{Timezone to use if \code{like} has no \code{tzone} (default "UTC").}
+
+\item{na_prop}{Optional NA proportion to enforce in the output (0–1). If \code{NULL} and
+\code{like} is provided, it copies the NA rate from \code{like}. If \code{like} is \code{NULL}, defaults to 0.}
 }
 \value{
-POSIXct vector of length n.
+A POSIXct vector of length \code{n}.
 }
 \description{
-Generate a Fake POSIXct Column
+Create synthetic timestamps either by mimicking an existing POSIXct vector
+(using its range and NA rate) or by sampling uniformly between \code{start} and \code{end}.
 }

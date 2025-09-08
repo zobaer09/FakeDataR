@@ -22,7 +22,6 @@ out <- tryCatch({
   }
   library(DBI); library(RSQLite); library(FakeDataR)
 
-  # Use a file-backed DB (more stable in knitr than ':memory:')
   dbfile <- file.path(tempdir(), "employees.sqlite")
   con <- DBI::dbConnect(RSQLite::SQLite(), dbfile)
   on.exit(try(DBI::dbDisconnect(con), silent = TRUE), add = TRUE)
@@ -40,10 +39,11 @@ out <- tryCatch({
   ")
 
   sch  <- schema_from_db(con, "employees")
-  fake <- generate_fake_from_schema(sch, n = 50, seed = 14)
+  fake <- generate_fake_from_schema(sch, n = 20, seed = 14)  # smaller
+
   b2 <- llm_bundle_from_db(
     conn = con, table = "employees",
-    n = 100, seed = 15, level = "high",
+    n = 40, seed = 15, level = "high",
     formats = "csv", path = tempdir(), filename = "employees_fake",
     write_prompt = TRUE, sensitive_strategy = "fake"
   )
@@ -54,7 +54,7 @@ out <- tryCatch({
 if (!ok) {
   cat("DB example skipped during vignette build:", msg, "\n")
 } else {
-  str(out$fake$hired_at)     # show it's POSIXct
+  str(out$fake$hired_at)
   out$bundle$schema_path
   out$bundle$data_paths$csv
 }

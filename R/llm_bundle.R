@@ -14,6 +14,7 @@
 #' @param zip Create a single zip archive containing data + schema + README? Default FALSE.
 #' @param prompt_filename Name for the README file. Default "README_FOR_LLM.txt".
 #' @param zip_filename Name for the zip file (no path). Default "<filename>.zip".
+#' @param normalize Logical; if TRUE, attempt light auto-normalization before faking.
 #' @param sensitive Character vector of column names to treat as sensitive (optional).
 #' @param sensitive_detect Logical, auto-detect common sensitive columns (id/email/phone). Default TRUE.
 #' @param sensitive_strategy "fake" (replace with realistic fakes) or "drop". Default "fake".
@@ -35,7 +36,8 @@ llm_bundle <- function(
     # --- sensitive passthrough ---
     sensitive = NULL,
     sensitive_detect = TRUE,
-    sensitive_strategy = c("fake","drop")
+    sensitive_strategy = c("fake","drop"),
+    normalize = FALSE
 ) {
   level <- match.arg(level)
   sensitive_strategy <- match.arg(sensitive_strategy)
@@ -57,7 +59,8 @@ llm_bundle <- function(
         data, n = n, level = level, seed = seed,
         sensitive = sensitive,
         sensitive_detect = sensitive_detect,
-        sensitive_strategy = sensitive_strategy
+        sensitive_strategy = sensitive_strategy,
+        normalize = normalize
       )
     },
     error = function(e) {

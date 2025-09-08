@@ -18,7 +18,8 @@ llm_bundle(
   zip_filename = NULL,
   sensitive = NULL,
   sensitive_detect = TRUE,
-  sensitive_strategy = c("fake", "drop")
+  sensitive_strategy = c("fake", "drop"),
+  normalize = FALSE
 )
 }
 \arguments{
@@ -49,6 +50,8 @@ llm_bundle(
 \item{sensitive_detect}{Logical, auto-detect common sensitive columns (id/email/phone). Default TRUE.}
 
 \item{sensitive_strategy}{"fake" (replace with realistic fakes) or "drop". Default "fake".}
+
+\item{normalize}{Logical; if TRUE, attempt light auto-normalization before faking.}
 }
 \value{
 List with paths: $data_paths (named), $schema_path, $readme_path (optional),

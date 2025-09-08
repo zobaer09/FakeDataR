@@ -6,12 +6,14 @@
 \usage{
 generate_fake_with_privacy(
   data,
-  n = NULL,
+  n = 30,
   level = c("low", "medium", "high"),
   seed = NULL,
   sensitive = NULL,
   sensitive_detect = TRUE,
   sensitive_strategy = c("fake", "drop"),
+  sensitive_patterns = NULL,
+  sensitive_regex = NULL,
   normalize = TRUE
 )
 }
