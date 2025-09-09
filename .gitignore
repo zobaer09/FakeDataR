@@ -27,3 +27,4 @@ package_inventory_new.csv
 .vscode/
 .idea/
 pkgdown/    # build cache (not the /docs site)
+docs/

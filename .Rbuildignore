@@ -32,3 +32,4 @@
 ^tools/.*$
 ^package_inventory_new\.csv$
 ^docs$
+^docs$
