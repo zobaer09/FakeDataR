@@ -10,6 +10,7 @@ vignette: >
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>", message = FALSE, warning = FALSE)
 set.seed(1)  # ensure RNG is initialized for clean vignette sessions
+library(FakeDataR)
 ```
 
 This vignette shows how to mirror the structure of real data with fully synthetic values, verify the structure, and produce an LLM-ready bundle.

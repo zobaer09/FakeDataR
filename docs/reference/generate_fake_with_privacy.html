@@ -30,6 +30,7 @@ maps to output via attr(fake, "name_map") if present.'><!-- mathjax --><script s
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
     <a class="dropdown-item" href="../articles/database-workflow.html">Database schema workflow (no data read)</a>
     <a class="dropdown-item" href="../articles/getting-started.html">FakeDataR: Getting started</a>
+    <a class="dropdown-item" href="../articles/privacy-and-validation.html">Privacy and validation</a>
   </div>
 </li>
       </ul><form class="form-inline my-2 my-lg-0" role="search">
@@ -63,13 +64,15 @@ maps to output via <code>attr(fake, "name_map")</code> if present.</p>
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">generate_fake_with_privacy</span><span class="op">(</span></span>
 <span>  <span class="va">data</span>,</span>
-<span>  n <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  n <span class="op">=</span> <span class="fl">30</span>,</span>
 <span>  level <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"low"</span>, <span class="st">"medium"</span>, <span class="st">"high"</span><span class="op">)</span>,</span>
 <span>  seed <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  sensitive <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  sensitive_detect <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  sensitive_strategy <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"fake"</span>, <span class="st">"drop"</span><span class="op">)</span>,</span>
-<span>  normalize <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>  normalize <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  sensitive_patterns <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  sensitive_regex <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -80,33 +83,41 @@ maps to output via <code>attr(fake, "name_map")</code> if present.</p>
 
 
 <dt>n</dt>
-<dd><p>Number of rows to generate (default: same as <code>nrow(data)</code> if NULL).</p></dd>
+<dd><p>Rows to generate (default same as input if NULL).</p></dd>
 
 
 <dt>level</dt>
-<dd><p>Privacy preset: one of "low", "medium", "high".</p></dd>
+<dd><p>One of "low","medium","high".</p></dd>
 
 
 <dt>seed</dt>
-<dd><p>Optional RNG seed for reproducibility.</p></dd>
+<dd><p>Optional RNG seed.</p></dd>
 
 
 <dt>sensitive</dt>
-<dd><p>Optional character vector of original column names to treat as sensitive.</p></dd>
+<dd><p>Character vector of original column names to treat as sensitive.</p></dd>
 
 
 <dt>sensitive_detect</dt>
-<dd><p>Logical; auto-detect common sensitive columns by name. Default TRUE.</p></dd>
+<dd><p>Logical; auto-detect common sensitive columns by name.</p></dd>
 
 
 <dt>sensitive_strategy</dt>
-<dd><p>One of "fake" (replace with tokens) or "drop". Default "fake".</p></dd>
+<dd><p>One of "fake" or "drop".</p></dd>
 
 
 <dt>normalize</dt>
-<dd><p>If TRUE (default), coerce &amp; normalize inputs (percent → numeric,
-mm/dd/yyyy HH:MM → POSIXct, yes/no → factor, blanks → NA; preserves
-"not applicable"/"no data" as real categories).</p></dd>
+<dd><p>Logical; lightly normalize inputs.</p></dd>
+
+
+<dt>sensitive_patterns</dt>
+<dd><p>Optional named list of patterns to treat as sensitive
+(e.g., list(id = "...", email = "...", phone = "...")). Overrides defaults.</p></dd>
+
+
+<dt>sensitive_regex</dt>
+<dd><p>Optional fully-combined regex (single string) to detect
+sensitive columns by name. If supplied, it is used instead of defaults.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -115,13 +126,17 @@ mm/dd/yyyy HH:MM → POSIXct, yes/no → factor, blanks → NA; preserves
 
 <p>data.frame with attributes: sensitive_columns, dropped_columns, name_map</p>
     </div>
+    <div class="section level2">
+    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+    <p>Generate fake data with privacy controls</p>
+    </div>
 
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside></div>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p></p><p>Developed by Zobaer Ahmed.</p>
+  <p></p><p>Developed by Zobaer Ahmed, PhD.</p>
 </div>
 
 <div class="pkgdown-footer-right">

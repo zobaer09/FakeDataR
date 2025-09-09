@@ -20,6 +20,7 @@ Imports:
     jsonlite,
     zip
 Suggests:
+    readr,
     testthat (>= 3.0.0),
     knitr,
     rmarkdown,

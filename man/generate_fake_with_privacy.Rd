@@ -12,29 +12,33 @@ generate_fake_with_privacy(
   sensitive = NULL,
   sensitive_detect = TRUE,
   sensitive_strategy = c("fake", "drop"),
+  normalize = TRUE,
   sensitive_patterns = NULL,
-  sensitive_regex = NULL,
-  normalize = TRUE
+  sensitive_regex = NULL
 )
 }
 \arguments{
 \item{data}{A data.frame (or coercible) to mirror.}
 
-\item{n}{Number of rows to generate (default: same as \code{nrow(data)} if NULL).}
+\item{n}{Rows to generate (default same as input if NULL).}
 
-\item{level}{Privacy preset: one of "low", "medium", "high".}
+\item{level}{One of "low","medium","high".}
 
-\item{seed}{Optional RNG seed for reproducibility.}
+\item{seed}{Optional RNG seed.}
 
-\item{sensitive}{Optional character vector of original column names to treat as sensitive.}
+\item{sensitive}{Character vector of original column names to treat as sensitive.}
 
-\item{sensitive_detect}{Logical; auto-detect common sensitive columns by name. Default TRUE.}
+\item{sensitive_detect}{Logical; auto-detect common sensitive columns by name.}
 
-\item{sensitive_strategy}{One of "fake" (replace with tokens) or "drop". Default "fake".}
+\item{sensitive_strategy}{One of "fake" or "drop".}
 
-\item{normalize}{If TRUE (default), coerce & normalize inputs (percent → numeric,
-mm/dd/yyyy HH:MM → POSIXct, yes/no → factor, blanks → NA; preserves
-"not applicable"/"no data" as real categories).}
+\item{normalize}{Logical; lightly normalize inputs.}
+
+\item{sensitive_patterns}{Optional named list of patterns to treat as sensitive
+(e.g., list(id = "...", email = "...", phone = "...")). Overrides defaults.}
+
+\item{sensitive_regex}{Optional fully-combined regex (single string) to detect
+sensitive columns by name. If supplied, it is used instead of defaults.}
 }
 \value{
 data.frame with attributes: sensitive_columns, dropped_columns, name_map
@@ -43,4 +47,7 @@ data.frame with attributes: sensitive_columns, dropped_columns, name_map
 Generates a synthetic copy of \code{data}, then optionally detects/handles
 sensitive columns by name. Detection uses the ORIGINAL column names and
 maps to output via \code{attr(fake, "name_map")} if present.
+}
+\details{
+Generate fake data with privacy controls
 }

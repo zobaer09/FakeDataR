@@ -13,7 +13,7 @@
     <loc>https://zobaer09.github.io/FakeDataR/articles/index.html</loc>
   </url>
   <url>
-    <loc>https://zobaer09.github.io/FakeDataR/articles/overview.html</loc>
+    <loc>https://zobaer09.github.io/FakeDataR/articles/privacy-and-validation.html</loc>
   </url>
   <url>
     <loc>https://zobaer09.github.io/FakeDataR/authors.html</loc>
@@ -29,6 +29,9 @@
   </url>
   <url>
     <loc>https://zobaer09.github.io/FakeDataR/news/index.html</loc>
+  </url>
+  <url>
+    <loc>https://zobaer09.github.io/FakeDataR/reference/detect_sensitive_columns.html</loc>
   </url>
   <url>
     <loc>https://zobaer09.github.io/FakeDataR/reference/export_fake.html</loc>
@@ -49,9 +52,6 @@
     <loc>https://zobaer09.github.io/FakeDataR/reference/generate_llm_prompt.html</loc>
   </url>
   <url>
-    <loc>https://zobaer09.github.io/FakeDataR/reference/grapes-or-or-grapes.html</loc>
-  </url>
-  <url>
     <loc>https://zobaer09.github.io/FakeDataR/reference/index.html</loc>
   </url>
   <url>
@@ -59,9 +59,6 @@
   </url>
   <url>
     <loc>https://zobaer09.github.io/FakeDataR/reference/llm_bundle_from_db.html</loc>
-  </url>
-  <url>
-    <loc>https://zobaer09.github.io/FakeDataR/reference/or_or.html</loc>
   </url>
   <url>
     <loc>https://zobaer09.github.io/FakeDataR/reference/prepare_input_data.html</loc>

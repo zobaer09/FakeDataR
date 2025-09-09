@@ -4,16 +4,20 @@
 #' sensitive columns by name. Detection uses the ORIGINAL column names and
 #' maps to output via `attr(fake, "name_map")` if present.
 #'
+#' Generate fake data with privacy controls
+#'
 #' @param data A data.frame (or coercible) to mirror.
-#' @param n Number of rows to generate (default: same as `nrow(data)` if NULL).
-#' @param level Privacy preset: one of "low", "medium", "high".
-#' @param seed Optional RNG seed for reproducibility.
-#' @param sensitive Optional character vector of original column names to treat as sensitive.
-#' @param sensitive_detect Logical; auto-detect common sensitive columns by name. Default TRUE.
-#' @param sensitive_strategy One of "fake" (replace with tokens) or "drop". Default "fake".
-#' @param normalize If TRUE (default), coerce & normalize inputs (percent → numeric,
-#'   mm/dd/yyyy HH:MM → POSIXct, yes/no → factor, blanks → NA; preserves
-#'   "not applicable"/"no data" as real categories).
+#' @param n Rows to generate (default same as input if NULL).
+#' @param level One of "low","medium","high".
+#' @param seed Optional RNG seed.
+#' @param sensitive Character vector of original column names to treat as sensitive.
+#' @param sensitive_detect Logical; auto-detect common sensitive columns by name.
+#' @param sensitive_strategy One of "fake" or "drop".
+#' @param normalize Logical; lightly normalize inputs.
+#' @param sensitive_patterns Optional named list of patterns to treat as sensitive
+#'   (e.g., list(id = "...", email = "...", phone = "...")). Overrides defaults.
+#' @param sensitive_regex Optional fully-combined regex (single string) to detect
+#'   sensitive columns by name. If supplied, it is used instead of defaults.
 #' @return data.frame with attributes: sensitive_columns, dropped_columns, name_map
 #' @export
 generate_fake_with_privacy <- function(
@@ -24,9 +28,9 @@ generate_fake_with_privacy <- function(
     sensitive = NULL,
     sensitive_detect = TRUE,
     sensitive_strategy = c("fake","drop"),
-    sensitive_patterns = NULL, 
-    sensitive_regex = NULL,
-    normalize = TRUE
+    normalize = TRUE,
+    sensitive_patterns = NULL,
+    sensitive_regex = NULL
 ) {
   level <- match.arg(level)
   sensitive_strategy <- match.arg(sensitive_strategy)

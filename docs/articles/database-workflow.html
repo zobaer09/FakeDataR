@@ -43,6 +43,7 @@
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
     <a class="dropdown-item" href="../articles/database-workflow.html">Database schema workflow (no data read)</a>
     <a class="dropdown-item" href="../articles/getting-started.html">FakeDataR: Getting started</a>
+    <a class="dropdown-item" href="../articles/privacy-and-validation.html">Privacy and validation</a>
   </div>
 </li>
       </ul>
@@ -89,7 +90,6 @@ generate synthetic rows without reading any real data.</p>
 <span>  <span class="op">}</span></span>
 <span>  <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dbi.r-dbi.org" class="external-link">DBI</a></span><span class="op">)</span>; <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rsqlite.r-dbi.org" class="external-link">RSQLite</a></span><span class="op">)</span>; <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://zobaer09.github.io/FakeDataR/">FakeDataR</a></span><span class="op">)</span></span>
 <span></span>
-<span>  <span class="co"># Use a file-backed DB (more stable in knitr than ':memory:')</span></span>
 <span>  <span class="va">dbfile</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"employees.sqlite"</span><span class="op">)</span></span>
 <span>  <span class="va">con</span> <span class="op">&lt;-</span> <span class="fu">DBI</span><span class="fu">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbConnect.html" class="external-link">dbConnect</a></span><span class="op">(</span><span class="fu">RSQLite</span><span class="fu">::</span><span class="fu"><a href="https://rsqlite.r-dbi.org/reference/SQLite.html" class="external-link">SQLite</a></span><span class="op">(</span><span class="op">)</span>, <span class="va">dbfile</span><span class="op">)</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/on.exit.html" class="external-link">on.exit</a></span><span class="op">(</span><span class="kw"><a href="https://rdrr.io/r/base/try.html" class="external-link">try</a></span><span class="op">(</span><span class="fu">DBI</span><span class="fu">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbDisconnect.html" class="external-link">dbDisconnect</a></span><span class="op">(</span><span class="va">con</span><span class="op">)</span>, silent <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>, add <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
@@ -107,10 +107,11 @@ generate synthetic rows without reading any real data.</p>
 <span><span class="st">  "</span><span class="op">)</span></span>
 <span></span>
 <span>  <span class="va">sch</span>  <span class="op">&lt;-</span> <span class="fu"><a href="../reference/schema_from_db.html">schema_from_db</a></span><span class="op">(</span><span class="va">con</span>, <span class="st">"employees"</span><span class="op">)</span></span>
-<span>  <span class="va">fake</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/generate_fake_from_schema.html">generate_fake_from_schema</a></span><span class="op">(</span><span class="va">sch</span>, n <span class="op">=</span> <span class="fl">50</span>, seed <span class="op">=</span> <span class="fl">14</span><span class="op">)</span></span>
+<span>  <span class="va">fake</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/generate_fake_from_schema.html">generate_fake_from_schema</a></span><span class="op">(</span><span class="va">sch</span>, n <span class="op">=</span> <span class="fl">20</span>, seed <span class="op">=</span> <span class="fl">14</span><span class="op">)</span>  <span class="co"># smaller</span></span>
+<span></span>
 <span>  <span class="va">b2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/llm_bundle_from_db.html">llm_bundle_from_db</a></span><span class="op">(</span></span>
 <span>    conn <span class="op">=</span> <span class="va">con</span>, table <span class="op">=</span> <span class="st">"employees"</span>,</span>
-<span>    n <span class="op">=</span> <span class="fl">100</span>, seed <span class="op">=</span> <span class="fl">15</span>, level <span class="op">=</span> <span class="st">"high"</span>,</span>
+<span>    n <span class="op">=</span> <span class="fl">40</span>, seed <span class="op">=</span> <span class="fl">15</span>, level <span class="op">=</span> <span class="st">"high"</span>,</span>
 <span>    formats <span class="op">=</span> <span class="st">"csv"</span>, path <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, filename <span class="op">=</span> <span class="st">"employees_fake"</span>,</span>
 <span>    write_prompt <span class="op">=</span> <span class="cn">TRUE</span>, sensitive_strategy <span class="op">=</span> <span class="st">"fake"</span></span>
 <span>  <span class="op">)</span></span>
@@ -121,12 +122,12 @@ generate synthetic rows without reading any real data.</p>
 <span><span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="va">ok</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"DB example skipped during vignette build:"</span>, <span class="va">msg</span>, <span class="st">"\n"</span><span class="op">)</span></span>
 <span><span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">out</span><span class="op">$</span><span class="va">fake</span><span class="op">$</span><span class="va">hired_at</span><span class="op">)</span>     <span class="co"># show it's POSIXct</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">out</span><span class="op">$</span><span class="va">fake</span><span class="op">$</span><span class="va">hired_at</span><span class="op">)</span></span>
 <span>  <span class="va">out</span><span class="op">$</span><span class="va">bundle</span><span class="op">$</span><span class="va">schema_path</span></span>
 <span>  <span class="va">out</span><span class="op">$</span><span class="va">bundle</span><span class="op">$</span><span class="va">data_paths</span><span class="op">$</span><span class="va">csv</span></span>
 <span><span class="op">}</span></span>
-<span><span class="co">#&gt;  POSIXct[1:50], format: "2025-08-15 20:33:03" "2025-08-15 11:58:08" "2025-08-16 17:09:53" ...</span></span>
-<span><span class="co">#&gt; [1] "C:\\Users\\ZOBAER~1\\AppData\\Local\\Temp\\RtmpsHttSY/employees_fake.csv"</span></span></code></pre></div>
+<span><span class="co">#&gt;  POSIXct[1:20], format: "2025-09-08 00:05:23" "2025-09-08 06:41:56" "2025-09-06 11:09:35" ...</span></span>
+<span><span class="co">#&gt; [1] "C:\\Users\\ZOBAER~1\\AppData\\Local\\Temp\\RtmpgVY4lk/employees_fake.csv"</span></span></code></pre></div>
   </main>
 </div>
 
@@ -134,7 +135,7 @@ generate synthetic rows without reading any real data.</p>
 
     <footer><div class="pkgdown-footer-left">
   <p></p>
-<p>Developed by Zobaer Ahmed.</p>
+<p>Developed by Zobaer Ahmed, PhD.</p>
 </div>
 
 <div class="pkgdown-footer-right">

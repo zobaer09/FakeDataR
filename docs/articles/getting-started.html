@@ -43,6 +43,7 @@
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
     <a class="dropdown-item" href="../articles/database-workflow.html">Database schema workflow (no data read)</a>
     <a class="dropdown-item" href="../articles/getting-started.html">FakeDataR: Getting started</a>
+    <a class="dropdown-item" href="../articles/privacy-and-validation.html">Privacy and validation</a>
   </div>
 </li>
       </ul>
@@ -85,6 +86,39 @@ bundle.</p>
 <h2 id="quick-start">Quick start<a class="anchor" aria-label="anchor" href="#quick-start"></a>
 </h2>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># tiny input with a few likely sensitive fields</span></span>
+<span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>  id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="st">"id%03d"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">)</span>,</span>
+<span>  email <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"a"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">10</span>, <span class="st">"@x.com"</span><span class="op">)</span>,</span>
+<span>  Progress <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fl">80</span><span class="op">:</span><span class="fl">100</span>, <span class="fl">10</span>, <span class="cn">TRUE</span><span class="op">)</span>, <span class="st">"%"</span><span class="op">)</span>,</span>
+<span>  check.names <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">orig</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/prepare_input_data.html">prepare_input_data</a></span><span class="op">(</span><span class="va">df</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">fake_priv</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/generate_fake_with_privacy.html">generate_fake_with_privacy</a></span><span class="op">(</span></span>
+<span>  data <span class="op">=</span> <span class="va">orig</span>, n <span class="op">=</span> <span class="fl">10</span>, level <span class="op">=</span> <span class="st">"low"</span>, seed <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  sensitive <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"id"</span>, <span class="st">"email"</span><span class="op">)</span>,</span>
+<span>  sensitive_detect <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  sensitive_strategy <span class="op">=</span> <span class="st">"fake"</span>,</span>
+<span>  normalize <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># quick validation sample</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="../reference/validate_fake.html">validate_fake</a></span><span class="op">(</span><span class="va">orig</span>, <span class="va">fake_priv</span><span class="op">)</span>, <span class="fl">5</span><span class="op">)</span></span>
+<span><span class="co">#&gt;     column class_original class_fake class_match na_prop_original na_prop_fake</span></span>
+<span><span class="co">#&gt; 1       id      character    integer       FALSE                0            0</span></span>
+<span><span class="co">#&gt; 2    email      character  character        TRUE                0            0</span></span>
+<span><span class="co">#&gt; 3 Progress        numeric    numeric        TRUE                0            0</span></span>
+<span><span class="co">#&gt;   na_match blank_prop_original blank_prop_fake blank_match</span></span>
+<span><span class="co">#&gt; 1     TRUE                   0              NA          NA</span></span>
+<span><span class="co">#&gt; 2     TRUE                   0               0        TRUE</span></span>
+<span><span class="co">#&gt; 3     TRUE                  NA              NA          NA</span></span>
+<span><span class="co">#&gt;   range_within_original</span></span>
+<span><span class="co">#&gt; 1                    NA</span></span>
+<span><span class="co">#&gt; 2                    NA</span></span>
+<span><span class="co">#&gt; 3                  TRUE</span></span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://zobaer09.github.io/FakeDataR/">FakeDataR</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Basic fake from a data.frame</span></span>
@@ -130,7 +164,7 @@ bundle.</p>
 <div class="section level2">
 <h2 id="factors-characters-and-numerics">Factors, characters, and numerics<a class="anchor" aria-label="anchor" href="#factors-characters-and-numerics"></a>
 </h2>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fake_co2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/generate_fake_data.html">generate_fake_data</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">CO2</span><span class="op">)</span>, n <span class="op">=</span> <span class="fl">200</span>, seed <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/validate_fake.html">validate_fake</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">CO2</span><span class="op">)</span>, <span class="va">fake_co2</span><span class="op">)</span></span>
 <span><span class="co">#&gt;      column class_original class_fake class_match na_prop_original na_prop_fake</span></span>
@@ -151,7 +185,7 @@ bundle.</p>
 <span><span class="co">#&gt; 3                    NA</span></span>
 <span><span class="co">#&gt; 4                  TRUE</span></span>
 <span><span class="co">#&gt; 5                  TRUE</span></span></code></pre></div>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fake_tg</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/generate_fake_data.html">generate_fake_data</a></span><span class="op">(</span><span class="va">ToothGrowth</span>, n <span class="op">=</span> <span class="fl">120</span>, seed <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/validate_fake.html">validate_fake</a></span><span class="op">(</span><span class="va">ToothGrowth</span>, <span class="va">fake_tg</span><span class="op">)</span></span>
 <span><span class="co">#&gt;   column class_original class_fake class_match na_prop_original na_prop_fake</span></span>
@@ -170,12 +204,12 @@ bundle.</p>
 <div class="section level2">
 <h2 id="dates-and-posixct-time-zones-preserved">Dates and POSIXct (time zones preserved)<a class="anchor" aria-label="anchor" href="#dates-and-posixct-time-zones-preserved"></a>
 </h2>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">df_date</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>d <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="st">"2020-01-01"</span><span class="op">)</span>, by <span class="op">=</span> <span class="st">"day"</span>, length.out <span class="op">=</span> <span class="fl">50</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">fake_date</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/generate_fake_data.html">generate_fake_data</a></span><span class="op">(</span><span class="va">df_date</span>, n <span class="op">=</span> <span class="fl">80</span>, seed <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">fake_date</span><span class="op">$</span><span class="va">d</span><span class="op">)</span></span>
-<span><span class="co">#&gt;  Date[1:80], format: "2020-01-11" "2020-01-03" "2020-01-07" "2020-02-13" "2020-01-30" ...</span></span></code></pre></div>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<span><span class="co">#&gt;  Date[1:80], format: "2020-01-30" "2020-01-01" "2020-01-15" "2020-01-15" "2020-02-10" ...</span></span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">dt</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
 <span>  when <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.POSIXt.html" class="external-link">seq.POSIXt</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/as.POSIXlt.html" class="external-link">as.POSIXct</a></span><span class="op">(</span><span class="st">"2023-05-01 00:00:00"</span>, tz <span class="op">=</span> <span class="st">"America/New_York"</span><span class="op">)</span>,</span>
 <span>                    by <span class="op">=</span> <span class="st">"hour"</span>, length.out <span class="op">=</span> <span class="fl">200</span><span class="op">)</span></span>
@@ -187,79 +221,52 @@ bundle.</p>
 <span><span class="co">#&gt; [1] "2023-05-01 02:52:55 EDT" "2023-05-09 00:13:36 EDT"</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="public-datasets-optional">Public datasets (optional)<a class="anchor" aria-label="anchor" href="#public-datasets-optional"></a>
+<h2 id="public-datasets---wrap-in-guards-trim-sizes">Public datasets - wrap in guards, trim sizes<a class="anchor" aria-label="anchor" href="#public-datasets---wrap-in-guards-trim-sizes"></a>
 </h2>
 <p>These chunks run only if the packages are installed.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">fl</span> <span class="op">&lt;-</span> <span class="fu">nycflights13</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/nycflights13/man/flights.html" class="external-link">flights</a></span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span></span>
-<span><span class="va">fl_small</span> <span class="op">&lt;-</span> <span class="va">fl</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample.int</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">fl</span><span class="op">)</span>, <span class="fl">5000</span><span class="op">)</span>, <span class="op">]</span></span>
-<span><span class="va">fake_fl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/generate_fake_data.html">generate_fake_data</a></span><span class="op">(</span><span class="va">fl_small</span>, n <span class="op">=</span> <span class="fl">2000</span>, seed <span class="op">=</span> <span class="fl">10</span>, numeric_mode <span class="op">=</span> <span class="st">"distribution"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/validate_fake.html">validate_fake</a></span><span class="op">(</span><span class="va">fl_small</span>, <span class="va">fake_fl</span><span class="op">)</span></span>
-<span><span class="co">#&gt;            column class_original     class_fake class_match na_prop_original</span></span>
-<span><span class="co">#&gt; 1            year        integer        integer        TRUE           0.0000</span></span>
-<span><span class="co">#&gt; 2           month        integer        integer        TRUE           0.0000</span></span>
-<span><span class="co">#&gt; 3             day        integer        integer        TRUE           0.0000</span></span>
-<span><span class="co">#&gt; 4        dep_time        integer        integer        TRUE           0.0264</span></span>
-<span><span class="co">#&gt; 5  sched_dep_time        integer        integer        TRUE           0.0000</span></span>
-<span><span class="co">#&gt; 6       dep_delay        numeric        numeric        TRUE           0.0264</span></span>
-<span><span class="co">#&gt; 7        arr_time        integer        integer        TRUE           0.0288</span></span>
-<span><span class="co">#&gt; 8  sched_arr_time        integer        integer        TRUE           0.0000</span></span>
-<span><span class="co">#&gt; 9       arr_delay        numeric        numeric        TRUE           0.0318</span></span>
-<span><span class="co">#&gt; 10        carrier      character      character        TRUE           0.0000</span></span>
-<span><span class="co">#&gt; 11         flight        integer        integer        TRUE           0.0000</span></span>
-<span><span class="co">#&gt; 12        tailnum      character      character        TRUE           0.0056</span></span>
-<span><span class="co">#&gt; 13         origin      character      character        TRUE           0.0000</span></span>
-<span><span class="co">#&gt; 14           dest      character      character        TRUE           0.0000</span></span>
-<span><span class="co">#&gt; 15       air_time        numeric        numeric        TRUE           0.0318</span></span>
-<span><span class="co">#&gt; 16       distance        numeric        numeric        TRUE           0.0000</span></span>
-<span><span class="co">#&gt; 17           hour        numeric        numeric        TRUE           0.0000</span></span>
-<span><span class="co">#&gt; 18         minute        numeric        numeric        TRUE           0.0000</span></span>
-<span><span class="co">#&gt; 19      time_hour POSIXct/POSIXt POSIXct/POSIXt        TRUE           0.0000</span></span>
-<span><span class="co">#&gt;    na_prop_fake na_match blank_prop_original blank_prop_fake blank_match</span></span>
-<span><span class="co">#&gt; 1        1.0000    FALSE                  NA              NA          NA</span></span>
-<span><span class="co">#&gt; 2        0.0000     TRUE                  NA              NA          NA</span></span>
-<span><span class="co">#&gt; 3        0.0000     TRUE                  NA              NA          NA</span></span>
-<span><span class="co">#&gt; 4        0.0225     TRUE                  NA              NA          NA</span></span>
-<span><span class="co">#&gt; 5        0.0000     TRUE                  NA              NA          NA</span></span>
-<span><span class="co">#&gt; 6        0.0200     TRUE                  NA              NA          NA</span></span>
-<span><span class="co">#&gt; 7        0.0290     TRUE                  NA              NA          NA</span></span>
-<span><span class="co">#&gt; 8        0.0000     TRUE                  NA              NA          NA</span></span>
-<span><span class="co">#&gt; 9        0.0370     TRUE                  NA              NA          NA</span></span>
-<span><span class="co">#&gt; 10       0.0000     TRUE                   0               0        TRUE</span></span>
-<span><span class="co">#&gt; 11       0.0000     TRUE                  NA              NA          NA</span></span>
-<span><span class="co">#&gt; 12       0.0080     TRUE                   0               0        TRUE</span></span>
-<span><span class="co">#&gt; 13       0.0000     TRUE                   0               0        TRUE</span></span>
-<span><span class="co">#&gt; 14       0.0000     TRUE                   0               0        TRUE</span></span>
-<span><span class="co">#&gt; 15       0.0315     TRUE                  NA              NA          NA</span></span>
-<span><span class="co">#&gt; 16       0.0000     TRUE                  NA              NA          NA</span></span>
-<span><span class="co">#&gt; 17       0.0000     TRUE                  NA              NA          NA</span></span>
-<span><span class="co">#&gt; 18       0.0000     TRUE                  NA              NA          NA</span></span>
-<span><span class="co">#&gt; 19       0.0000     TRUE                  NA              NA          NA</span></span>
-<span><span class="co">#&gt;    range_within_original</span></span>
-<span><span class="co">#&gt; 1                  FALSE</span></span>
-<span><span class="co">#&gt; 2                  FALSE</span></span>
-<span><span class="co">#&gt; 3                  FALSE</span></span>
-<span><span class="co">#&gt; 4                  FALSE</span></span>
-<span><span class="co">#&gt; 5                  FALSE</span></span>
-<span><span class="co">#&gt; 6                  FALSE</span></span>
-<span><span class="co">#&gt; 7                  FALSE</span></span>
-<span><span class="co">#&gt; 8                  FALSE</span></span>
-<span><span class="co">#&gt; 9                  FALSE</span></span>
-<span><span class="co">#&gt; 10                    NA</span></span>
-<span><span class="co">#&gt; 11                 FALSE</span></span>
-<span><span class="co">#&gt; 12                    NA</span></span>
-<span><span class="co">#&gt; 13                    NA</span></span>
-<span><span class="co">#&gt; 14                    NA</span></span>
-<span><span class="co">#&gt; 15                 FALSE</span></span>
-<span><span class="co">#&gt; 16                 FALSE</span></span>
-<span><span class="co">#&gt; 17                 FALSE</span></span>
-<span><span class="co">#&gt; 18                 FALSE</span></span>
-<span><span class="co">#&gt; 19                  TRUE</span></span></code></pre></div>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">peng</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/na.fail.html" class="external-link">na.omit</a></span><span class="op">(</span><span class="fu">palmerpenguins</span><span class="fu">::</span><span class="va"><a href="https://allisonhorst.github.io/palmerpenguins/reference/penguins.html" class="external-link">penguins</a></span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"species"</span>,<span class="st">"island"</span>,<span class="st">"bill_length_mm"</span>,<span class="st">"sex"</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span>
-<span><span class="va">fake_peng</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/generate_fake_data.html">generate_fake_data</a></span><span class="op">(</span><span class="va">peng</span>, n <span class="op">=</span> <span class="fl">600</span>, seed <span class="op">=</span> <span class="fl">11</span>, category_mode <span class="op">=</span> <span class="st">"preserve"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/validate_fake.html">validate_fake</a></span><span class="op">(</span><span class="va">peng</span>, <span class="va">fake_peng</span><span class="op">)</span></span>
+<code class="sourceCode R"><span></span>
+<span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"nycflights13"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">fl</span> <span class="op">&lt;-</span> <span class="fu">nycflights13</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/nycflights13/man/flights.html" class="external-link">flights</a></span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span></span>
+<span>  <span class="va">fl_small</span> <span class="op">&lt;-</span> <span class="va">fl</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample.int</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">fl</span><span class="op">)</span>, <span class="fl">2000</span><span class="op">)</span>, <span class="op">]</span>  <span class="co"># smaller</span></span>
+<span>  <span class="va">fake_fl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/generate_fake_data.html">generate_fake_data</a></span><span class="op">(</span></span>
+<span>    <span class="va">fl_small</span>, n <span class="op">=</span> <span class="fl">500</span>, seed <span class="op">=</span> <span class="fl">10</span>,</span>
+<span>    numeric_mode <span class="op">=</span> <span class="st">"distribution"</span></span>
+<span>  <span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="../reference/validate_fake.html">validate_fake</a></span><span class="op">(</span><span class="va">fl_small</span>, <span class="va">fake_fl</span><span class="op">)</span>, <span class="fl">5</span><span class="op">)</span></span>
+<span><span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="st">"nycflights13 not installed - skipping."</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span><span class="co">#&gt;           column class_original class_fake class_match na_prop_original</span></span>
+<span><span class="co">#&gt; 1           year        integer    integer        TRUE            0.000</span></span>
+<span><span class="co">#&gt; 2          month        integer    integer        TRUE            0.000</span></span>
+<span><span class="co">#&gt; 3            day        integer    integer        TRUE            0.000</span></span>
+<span><span class="co">#&gt; 4       dep_time        integer    integer        TRUE            0.027</span></span>
+<span><span class="co">#&gt; 5 sched_dep_time        integer    integer        TRUE            0.000</span></span>
+<span><span class="co">#&gt;   na_prop_fake na_match blank_prop_original blank_prop_fake blank_match</span></span>
+<span><span class="co">#&gt; 1         0.00     TRUE                  NA              NA          NA</span></span>
+<span><span class="co">#&gt; 2         0.00     TRUE                  NA              NA          NA</span></span>
+<span><span class="co">#&gt; 3         0.00     TRUE                  NA              NA          NA</span></span>
+<span><span class="co">#&gt; 4         0.02     TRUE                  NA              NA          NA</span></span>
+<span><span class="co">#&gt; 5         0.00     TRUE                  NA              NA          NA</span></span>
+<span><span class="co">#&gt;   range_within_original</span></span>
+<span><span class="co">#&gt; 1                  TRUE</span></span>
+<span><span class="co">#&gt; 2                  TRUE</span></span>
+<span><span class="co">#&gt; 3                  TRUE</span></span>
+<span><span class="co">#&gt; 4                  TRUE</span></span>
+<span><span class="co">#&gt; 5                  TRUE</span></span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"palmerpenguins"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">peng</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/na.fail.html" class="external-link">na.omit</a></span><span class="op">(</span><span class="fu">palmerpenguins</span><span class="fu">::</span><span class="va"><a href="https://allisonhorst.github.io/palmerpenguins/reference/penguins.html" class="external-link">penguins</a></span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"species"</span>,<span class="st">"island"</span>,<span class="st">"bill_length_mm"</span>,<span class="st">"sex"</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span>
+<span>  <span class="va">fake_peng</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/generate_fake_data.html">generate_fake_data</a></span><span class="op">(</span></span>
+<span>    <span class="va">peng</span>, n <span class="op">=</span> <span class="fl">400</span>, seed <span class="op">=</span> <span class="fl">11</span>,</span>
+<span>    category_mode <span class="op">=</span> <span class="st">"preserve"</span></span>
+<span>  <span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="../reference/validate_fake.html">validate_fake</a></span><span class="op">(</span><span class="va">peng</span>, <span class="va">fake_peng</span><span class="op">)</span>, <span class="fl">5</span><span class="op">)</span></span>
+<span><span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="st">"palmerpenguins not installed - skipping."</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
 <span><span class="co">#&gt;           column class_original class_fake class_match na_prop_original</span></span>
 <span><span class="co">#&gt; 1        species         factor     factor        TRUE                0</span></span>
 <span><span class="co">#&gt; 2         island         factor     factor        TRUE                0</span></span>
@@ -279,7 +286,7 @@ bundle.</p>
 <div class="section level2">
 <h2 id="gapminder-demo">Gapminder demo<a class="anchor" aria-label="anchor" href="#gapminder-demo"></a>
 </h2>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Optional package; make the chunk robust</span></span>
 <span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"gapminder"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">21</span><span class="op">)</span></span>
@@ -287,7 +294,7 @@ bundle.</p>
 <span>  <span class="co"># Keep it light if you want: gm &lt;- gm[sample.int(nrow(gm), 2000), ]</span></span>
 <span></span>
 <span>  <span class="va">fake_gm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/generate_fake_data.html">generate_fake_data</a></span><span class="op">(</span></span>
-<span>    <span class="va">gm</span>, n <span class="op">=</span> <span class="fl">1500</span>, seed <span class="op">=</span> <span class="fl">21</span>,</span>
+<span>    <span class="va">gm</span>, n <span class="op">=</span> <span class="fl">800</span>, seed <span class="op">=</span> <span class="fl">21</span>,</span>
 <span>    numeric_mode <span class="op">=</span> <span class="st">"distribution"</span>,  <span class="co"># nicer numeric spread</span></span>
 <span>    category_mode <span class="op">=</span> <span class="st">"preserve"</span>      <span class="co"># keep factor levels</span></span>
 <span>  <span class="op">)</span></span>
@@ -313,15 +320,15 @@ bundle.</p>
 <span><span class="co">#&gt;   range_within_original</span></span>
 <span><span class="co">#&gt; 1                    NA</span></span>
 <span><span class="co">#&gt; 2                    NA</span></span>
-<span><span class="co">#&gt; 3                 FALSE</span></span>
-<span><span class="co">#&gt; 4                 FALSE</span></span>
-<span><span class="co">#&gt; 5                 FALSE</span></span>
-<span><span class="co">#&gt; 6                 FALSE</span></span></code></pre></div>
+<span><span class="co">#&gt; 3                  TRUE</span></span>
+<span><span class="co">#&gt; 4                  TRUE</span></span>
+<span><span class="co">#&gt; 5                  TRUE</span></span>
+<span><span class="co">#&gt; 6                  TRUE</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="sensitive-columns-fake-vs-drop">Sensitive columns: fake vs drop<a class="anchor" aria-label="anchor" href="#sensitive-columns-fake-vs-drop"></a>
 </h2>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">12</span><span class="op">)</span></span>
 <span><span class="va">df_pii</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
 <span>  id    <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">100</span>,</span>
@@ -349,7 +356,7 @@ bundle.</p>
 <div class="section level2">
 <h2 id="llm-bundle-data-schema-readme-optional-zip">LLM bundle: data + schema + README (+ optional ZIP)<a class="anchor" aria-label="anchor" href="#llm-bundle-data-schema-readme-optional-zip"></a>
 </h2>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">b1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/llm_bundle.html">llm_bundle</a></span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">ToothGrowth</span>, n <span class="op">=</span> <span class="fl">150</span>, level <span class="op">=</span> <span class="st">"high"</span>, seed <span class="op">=</span> <span class="fl">10</span>,</span>
 <span>  formats <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"csv"</span>,<span class="st">"rds"</span><span class="op">)</span>,</span>
@@ -357,28 +364,32 @@ bundle.</p>
 <span>  write_prompt <span class="op">=</span> <span class="cn">TRUE</span>, zip <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span>
 <span><span class="va">b1</span><span class="op">$</span><span class="va">schema_path</span></span>
-<span><span class="co">#&gt; [1] "C:\\Users\\ZOBAER~1\\AppData\\Local\\Temp\\Rtmpm0I1i9/toothgrowth_fake_schema.json"</span></span>
+<span><span class="co">#&gt; [1] "C:\\Users\\ZOBAER~1\\AppData\\Local\\Temp\\RtmpKk4naT/toothgrowth_fake_schema.json"</span></span>
 <span><span class="va">b1</span><span class="op">$</span><span class="va">readme_path</span></span>
-<span><span class="co">#&gt; [1] "C:\\Users\\ZOBAER~1\\AppData\\Local\\Temp\\Rtmpm0I1i9/README_FOR_LLM.txt"</span></span>
+<span><span class="co">#&gt; [1] "C:\\Users\\ZOBAER~1\\AppData\\Local\\Temp\\RtmpKk4naT/README_FOR_LLM.txt"</span></span>
 <span><span class="va">b1</span><span class="op">$</span><span class="va">zip_path</span></span>
-<span><span class="co">#&gt; [1] "C:\\Users\\ZOBAER~1\\AppData\\Local\\Temp\\Rtmpm0I1i9/toothgrowth_fake.zip"</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] "C:\\Users\\ZOBAER~1\\AppData\\Local\\Temp\\RtmpKk4naT/toothgrowth_fake.zip"</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="parquet-export-optional">Parquet export (optional)<a class="anchor" aria-label="anchor" href="#parquet-export-optional"></a>
 </h2>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">fake_air</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/generate_fake_data.html">generate_fake_data</a></span><span class="op">(</span><span class="va">airquality</span>, n <span class="op">=</span> <span class="fl">1000</span>, seed <span class="op">=</span> <span class="fl">20</span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/export_fake.html">export_fake</a></span><span class="op">(</span><span class="va">fake_air</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"air.parquet"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"arrow"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">fake_air</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/generate_fake_data.html">generate_fake_data</a></span><span class="op">(</span><span class="va">airquality</span>, n <span class="op">=</span> <span class="fl">400</span>, seed <span class="op">=</span> <span class="fl">20</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="../reference/export_fake.html">export_fake</a></span><span class="op">(</span><span class="va">fake_air</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"air.parquet"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="st">"arrow not installed - skipping Parquet export."</span><span class="op">)</span></span>
+<span><span class="op">}</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="reproducibility">Reproducibility<a class="anchor" aria-label="anchor" href="#reproducibility"></a>
 </h2>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">a1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/generate_fake_data.html">generate_fake_data</a></span><span class="op">(</span><span class="va">CO2</span>, n <span class="op">=</span> <span class="fl">123</span>, seed <span class="op">=</span> <span class="fl">42</span><span class="op">)</span></span>
 <span><span class="va">a2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/generate_fake_data.html">generate_fake_data</a></span><span class="op">(</span><span class="va">CO2</span>, n <span class="op">=</span> <span class="fl">123</span>, seed <span class="op">=</span> <span class="fl">42</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">a1</span>, <span class="va">a2</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">big</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
 <span>  a <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">2e5</span><span class="op">)</span>,</span>
 <span>  b <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="va">letters</span>, <span class="fl">2e5</span>, <span class="cn">TRUE</span><span class="op">)</span>,</span>
@@ -386,9 +397,7 @@ bundle.</p>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="op">{</span></span>
 <span>  <span class="va">fake_big</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/generate_fake_data.html">generate_fake_data</a></span><span class="op">(</span><span class="va">big</span>, n <span class="op">=</span> <span class="fl">2e5</span>, seed <span class="op">=</span> <span class="fl">99</span><span class="op">)</span></span>
-<span><span class="op">}</span><span class="op">)</span></span>
-<span><span class="co">#&gt;    user  system elapsed </span></span>
-<span><span class="co">#&gt;    1.33    0.03    1.36</span></span></code></pre></div>
+<span><span class="op">}</span><span class="op">)</span></span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside>
@@ -398,7 +407,7 @@ bundle.</p>
 
     <footer><div class="pkgdown-footer-left">
   <p></p>
-<p>Developed by Zobaer Ahmed.</p>
+<p>Developed by Zobaer Ahmed, PhD.</p>
 </div>
 
 <div class="pkgdown-footer-right">

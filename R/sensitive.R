@@ -191,7 +191,7 @@ identify_sensitive_cols <- function(data, regex = .default_sensitive_regex()) {
     if (length(xx) == 0) {
       pool_min <- 1e7; pool_max <- 1e8 - 1
     } else {
-      digs <- floor(median(log10(abs(xx)), na.rm = TRUE)) + 1
+      digs <- floor(stats::median(log10(abs(xx)), na.rm = TRUE)) + 1
       digs[!is.finite(digs)] <- 8
       digs <- max(4, min(12, digs))
       pool_min <- 10^(digs - 1)

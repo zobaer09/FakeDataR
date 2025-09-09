@@ -4,7 +4,8 @@ pkgdown_sha: ~
 articles:
   database-workflow: database-workflow.html
   getting-started: getting-started.html
-last_built: 2025-08-22T01:49Z
+  privacy-and-validation: privacy-and-validation.html
+last_built: 2025-09-09T00:31Z
 urls:
   reference: https://zobaer09.github.io/FakeDataR/reference
   article: https://zobaer09.github.io/FakeDataR/articles

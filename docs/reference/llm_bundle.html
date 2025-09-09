@@ -28,6 +28,7 @@ and optionally writes a README prompt and a single ZIP file containing everythin
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
     <a class="dropdown-item" href="../articles/database-workflow.html">Database schema workflow (no data read)</a>
     <a class="dropdown-item" href="../articles/getting-started.html">FakeDataR: Getting started</a>
+    <a class="dropdown-item" href="../articles/privacy-and-validation.html">Privacy and validation</a>
   </div>
 </li>
       </ul><form class="form-inline my-2 my-lg-0" role="search">
@@ -72,7 +73,8 @@ and optionally writes a README prompt and a single ZIP file containing everythin
 <span>  zip_filename <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  sensitive <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  sensitive_detect <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  sensitive_strategy <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"fake"</span>, <span class="st">"drop"</span><span class="op">)</span></span>
+<span>  sensitive_strategy <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"fake"</span>, <span class="st">"drop"</span><span class="op">)</span>,</span>
+<span>  normalize <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -133,6 +135,10 @@ and optionally writes a README prompt and a single ZIP file containing everythin
 <dt>sensitive_strategy</dt>
 <dd><p>"fake" (replace with realistic fakes) or "drop". Default "fake".</p></dd>
 
+
+<dt>normalize</dt>
+<dd><p>Logical; if TRUE, attempt light auto-normalization before faking.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
@@ -147,7 +153,7 @@ $zip_path (optional), and $fake (data.frame).</p>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p></p><p>Developed by Zobaer Ahmed.</p>
+  <p></p><p>Developed by Zobaer Ahmed, PhD.</p>
 </div>
 
 <div class="pkgdown-footer-right">

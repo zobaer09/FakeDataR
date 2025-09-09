@@ -29,6 +29,7 @@ reference:
       - export_fake
       - prepare_input_data
       - generate_fake_posixct_column
+      - detect_sensitive_columns
 
 development:
   mode: auto
