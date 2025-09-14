@@ -10,7 +10,7 @@ detect_sensitive_columns(x_names, extra_patterns = NULL, override_regex = NULL)
 \item{x_names}{Character vector of column names to check.}
 
 \item{extra_patterns}{Character vector of additional regexes to OR in.
-Examples: c("mrn", "nhs", "aadhaar", "passport")}
+Examples: c("MRN", "NHS", "Aadhaar", "passport")}
 
 \item{override_regex}{Optional single regex string that fully replaces the
 defaults (case-insensitive). When supplied, \code{extra_patterns} is ignored.}
@@ -20,7 +20,7 @@ Character vector of names from \code{x_names} that matched.
 }
 \description{
 Uses a broad, configurable regex library to match likely PII columns.
-You can extend it with \code{extra_patterns} (they get OR'ed in) or replace
+You can extend it with \code{extra_patterns} (they get ORed in) or replace
 everything with a single \code{override_regex}.
 }
 \examples{

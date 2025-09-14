@@ -7,12 +7,12 @@
 #' Detect sensitive columns by name
 #'
 #' Uses a broad, configurable regex library to match likely PII columns.
-#' You can extend it with `extra_patterns` (they get OR'ed in) or replace
+#' You can extend it with `extra_patterns` (they get ORed in) or replace
 #' everything with a single `override_regex`.
 #'
 #' @param x_names Character vector of column names to check.
 #' @param extra_patterns Character vector of additional regexes to OR in.
-#'   Examples: c("mrn", "nhs", "aadhaar", "passport")
+#'   Examples: c("MRN", "NHS", "Aadhaar", "passport")
 #' @param override_regex Optional single regex string that fully replaces the
 #'   defaults (case-insensitive). When supplied, `extra_patterns` is ignored.
 #'
@@ -37,7 +37,7 @@ detect_sensitive_columns <- function(x_names,
 # ---- Internal pattern libraries ----------------------------------------------
 
 # A broad set of defaults covering many common PII-ish fields.
-# NOTE: These are OR'ed together in detect_sensitive_columns().
+# NOTE: These are ORed together in detect_sensitive_columns().
 #' @keywords internal
 #' @noRd
 .default_sensitive_patterns <- function() {
@@ -71,7 +71,7 @@ detect_sensitive_columns <- function(x_names,
     "ip(_address)?|mac(_address)?|imei|imsi|serial|device|udid|android[_-]?id|idfa|gaid",
     
     # Medical / patient
-    "mrn|nhs|medicare|medicaid|patient|diagnosis",
+    "MRN|NHS|medicare|medicaid|patient|diagnosis",
     
     # Birthdays / education
     "dob|date[_-]?of[_-]?birth|birthday|student[_-]?id"
@@ -83,7 +83,7 @@ detect_sensitive_columns <- function(x_names,
 #' @noRd
 .default_sensitive_groups <- function() {
   list(
-    id        = "(?i)(^id$|employee[_-]?id|customer[_-]?id|user[_-]?id$|nin\\b|mrn|nhs|ssn|sin|student[_-]?id)",
+    id        = "(?i)(^id$|employee[_-]?id|customer[_-]?id|user[_-]?id$|nin\\b|MRN|NHS|ssn|sin|student[_-]?id)",
     email     = "(?i)(email|e-mail)",
     phone     = "(?i)(phone|tel|mobile|cell|telephone|fax)",
     address   = "(?i)(address|street|road|ave(nue)?|boulevard|blvd|apt|unit|suite|zip|postal|postcode|city|state|province|country)",
@@ -92,7 +92,7 @@ detect_sensitive_columns <- function(x_names,
     finance   = "(?i)(iban|swift|bic|routing|sort[_-]?code|account|acct|bank|credit|debit|card|cvv|cvc|pan[_-]?number)",
     auth      = "(?i)(password|pass|pwd|pin|otp|secret|token|api[_-]?key|auth|bearer|session|cookie)",
     device    = "(?i)(ip(_address)?|mac(_address)?|imei|imsi|serial|device|udid|android[_-]?id|idfa|gaid)",
-    medical   = "(?i)(mrn|nhs|medicare|medicaid|patient|diagnosis)",
+    medical   = "(?i)(MRN|NHS|medicare|medicaid|patient|diagnosis)",
     birthday  = "(?i)(dob|date[_-]?of[_-]?birth|birthday)",
     name      = "(?i)(full[_-]?name|first[_-]?name|last[_-]?name|middle[_-]?name|nickname|alias)"
   )

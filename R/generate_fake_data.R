@@ -11,10 +11,9 @@
 #'   * distribution: sample observed values with replacement
 #' @param column_mode One of "keep","generic","custom".
 #'   * keep: keep original column names
-#'   * generic: rename to var1..varP (mapping in attr(name_map))
+#'   \code{var1..varP} (mapping in \code{attr(name_map)})
 #'   * custom: use \code{custom_names} named vector (old -> new)
 #' @param custom_levels optional named list of allowed levels per column (for
-#'   \code{category_mode="custom"}).
 #' @param custom_names optional named character vector old->new (for
 #'   \code{column_mode="custom"}).
 #' @param seed Optional RNG seed.
@@ -22,7 +21,7 @@
 #' @param sensitive Optional character vector of original column names to treat as sensitive.
 #' @param sensitive_detect Logical; auto-detect common sensitive columns by name.
 #' @param sensitive_strategy One of "fake","drop". Only applied if any sensitive columns exist.
-#' @param normalize Logical; lightly normalize inputs (trim, %→numeric, short datetimes→POSIXct).
+#' @param normalize Logical; lightly normalize inputs (trim, %→numeric, short date-times→POSIXct).
 #' @return A data.frame of n rows with attributes:
 #'   \itemize{
 #'     \item \code{name_map} (named chr: original -> output)

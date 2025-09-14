@@ -16,7 +16,7 @@ prepare_input_data(
 )
 }
 \arguments{
-\item{data}{An object coercible to \code{data.frame} (data.frame/tibble/data.table/matrix/list, etc.)}
+\item{data}{An object coercible to \code{data.frame} (data.frame/\pkg{tibble}/data.table/matrix/list, etc.)}
 
 \item{normalize}{Logical, run value normalization step (default \code{TRUE}).}
 
@@ -30,7 +30,7 @@ Matching is case-insensitive.}
 \item{percent_detect_threshold}{Proportion of non-missing values that must contain \verb{\%}
 before converting a character column to numeric (default \code{0.6}).}
 
-\item{datetime_formats}{Candidate formats tried (in order) when parsing date/time strings.
+\item{datetime_formats}{Candidate formats tried (in order) when parsing date-times strings.
 The best-fitting format (most successful parses) is used. Defaults cover
 \verb{mm/dd/yyyy HH:MM(:SS)?}, ISO-8601, and date-only.}
 }
@@ -43,7 +43,7 @@ it applies light, conservative value normalization:
 \itemize{
 \item Converts common date/time strings to POSIXct (best-effort across several formats)
 \item Converts percent-like character columns (e.g. "85\%") to numeric (85)
-\item Maps a configurable set of "NA-ish" strings to \code{NA}, while \emph{keeping} common survey
+\item Maps a configurable set of "NA-like" strings to \code{NA}, while \emph{keeping} common survey
 responses like "not applicable" or "prefer not to answer" as \strong{real levels}
 \item Normalizes yes/no character columns to an ordered factor \code{c("no","yes")}
 }

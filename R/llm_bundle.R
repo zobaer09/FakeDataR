@@ -8,12 +8,19 @@
 #' @param level Privacy level: "low", "medium", or "high". Controls stricter defaults.
 #' @param formats Which data files to write: any of "csv","rds","parquet".
 #' @param path Folder to write outputs. Default: \code{tempdir()}.
-#' @param filename Base filename (without extension). Default: "fake_bundle".
+#' @param filename Base file name (no extension). Example: "demo_bundle".
+#'   This becomes files like "demo_bundle.csv", "demo_bundle.rds", etc.
+#' @details
+#' **Tips**
+#' Avoid using angle brackets in examples; prefer plain tokens like `NAME`
+#' or `FILE_NAME`. If you truly want bracket glyphs, use Unicode ⟨name⟩ ⟩name⟨.
 #' @param seed Optional RNG seed for reproducibility.
 #' @param write_prompt Write a README_FOR_LLM.txt next to the data? Default TRUE.
 #' @param zip Create a single zip archive containing data + schema + README? Default FALSE.
 #' @param prompt_filename Name for the README file. Default "README_FOR_LLM.txt".
-#' @param zip_filename Name for the zip file (no path). Default "<filename>.zip".
+#' @param zip_filename Optional custom name for the ZIP file (no path).
+#'   If `NULL` (default), it is derived as `paste0(filename, ".zip")`,
+#'   e.g. `"demo_bundle.zip"`.
 #' @param normalize Logical; if TRUE, attempt light auto-normalization before faking.
 #' @param sensitive Character vector of column names to treat as sensitive (optional).
 #' @param sensitive_detect Logical, auto-detect common sensitive columns (id/email/phone). Default TRUE.

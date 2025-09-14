@@ -41,12 +41,11 @@ generate_fake_data(
 \item{column_mode}{One of "keep","generic","custom".
 \itemize{
 \item keep: keep original column names
-\item generic: rename to var1..varP (mapping in attr(name_map))
+\code{var1..varP} (mapping in \code{attr(name_map)})
 \item custom: use \code{custom_names} named vector (old -> new)
 }}
 
-\item{custom_levels}{optional named list of allowed levels per column (for
-\code{category_mode="custom"}).}
+\item{custom_levels}{optional named list of allowed levels per column (for}
 
 \item{custom_names}{optional named character vector old->new (for
 \code{column_mode="custom"}).}
@@ -61,7 +60,7 @@ generate_fake_data(
 
 \item{sensitive_strategy}{One of "fake","drop". Only applied if any sensitive columns exist.}
 
-\item{normalize}{Logical; lightly normalize inputs (trim, \%→numeric, short datetimes→POSIXct).}
+\item{normalize}{Logical; lightly normalize inputs (trim, \%→numeric, short date-times→POSIXct).}
 }
 \value{
 A data.frame of n rows with attributes:

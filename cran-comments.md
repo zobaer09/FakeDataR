@@ -1,14 +1,15 @@
 ## Test environments
-* Local: Windows 11, R 4.3.2
-* GitHub Actions: macOS 14 (release), Windows Server 2022 (release),
-  Ubuntu 22.04 (devel, release, oldrel-1)
+- Local Windows (R 4.3.x): R CMD check --as-cran: 0 errors | 0 warnings | 0 notes (or list notes, if any)
+- GitHub Actions: ubuntu-latest, macos-latest (Intel & arm64), windows-latest: passing
+- R-hub: linux, macOS (Intel/arm64), Windows: passing
+- win-builder: R-release & R-devel: passing
 
-## R CMD check results
+## Notes
+- First CRAN submission for package name “FakeDataR”.
+- Examples and vignettes are fast; no network or long-running code.
+- No non-CRAN dependencies required to build vignettes.
 
-- Local (macOS), GitHub Actions (macOS/Windows/Ubuntu), and rhub: 0 ERRORs, 0 WARNINGs.
-- Win-builder (R-devel, Windows): 2 NOTEs
-  1. “unable to verify current time” – due to CI/VM clock, no user-facing effect.
-  2. “New submission” – this is the package’s first CRAN release.
+## Downstream dependencies
+- None.
 
-The package has no compiled code and no non-standard system requirements.
 

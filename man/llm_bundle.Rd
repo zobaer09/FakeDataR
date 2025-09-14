@@ -67,5 +67,5 @@ and optionally writes a README prompt and a single ZIP file containing everythin
 \details{
 \strong{Tips}
 Avoid using angle brackets in examples; prefer plain tokens like \code{NAME}
-or \code{FILE_NAME}. If you truly want bracket glyphs, use unicode ⟨name⟩ ⟩name⟨.
+or \code{FILE_NAME}. If you truly want bracket glyphs, use Unicode ⟨name⟩ ⟩name⟨.
 }

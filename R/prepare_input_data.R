@@ -4,11 +4,11 @@
 #' it applies light, conservative value normalization:
 #' - Converts common date/time strings to POSIXct (best-effort across several formats)
 #' - Converts percent-like character columns (e.g. "85%") to numeric (85)
-#' - Maps a configurable set of "NA-ish" strings to `NA`, while *keeping* common survey
+#' - Maps a configurable set of "NA-like" strings to `NA`, while *keeping* common survey
 #'   responses like "not applicable" or "prefer not to answer" as **real levels**
 #' - Normalizes yes/no character columns to an ordered factor `c("no","yes")`
 #'
-#' @param data An object coercible to `data.frame` (data.frame/tibble/data.table/matrix/list, etc.)
+#' @param data An object coercible to `data.frame` (data.frame/\pkg{tibble}/data.table/matrix/list, etc.)
 #' @param normalize Logical, run value normalization step (default `TRUE`).
 #' @param na_strings Character vector that should become `NA`
 #'   (default: `c("", "NA", "N/A", "na", "No data", "no data")`).
@@ -17,7 +17,7 @@
 #'   Matching is case-insensitive.
 #' @param percent_detect_threshold Proportion of non-missing values that must contain `%`
 #'   before converting a character column to numeric (default `0.6`).
-#' @param datetime_formats Candidate formats tried (in order) when parsing date/time strings.
+#' @param datetime_formats Candidate formats tried (in order) when parsing date-times strings.
 #'   The best-fitting format (most successful parses) is used. Defaults cover
 #'   `mm/dd/yyyy HH:MM(:SS)?`, ISO-8601, and date-only.
 #' @return A base `data.frame`.
