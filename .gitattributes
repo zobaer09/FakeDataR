@@ -1,7 +1,30 @@
-* text=auto
-*.R   text eol=lf
-*.Rmd text eol=lf
-*.Rd  text eol=lf
-*.html *.js *.css *.xml text eol=lf
-NAMESPACE text eol=lf
-DESCRIPTION text eol=lf
+cat > .gitattributes << 'EOF'
+# Normalize text files to LF in repo
+* text=auto eol=lf
+
+# Keep Windows scripts with CRLF
+*.bat eol=crlf
+*.cmd eol=crlf
+
+# Force LF for source/docs
+*.R     text eol=lf
+*.Rmd   text eol=lf
+*.Rd    text eol=lf
+*.yml   text eol=lf
+*.yaml  text eol=lf
+*.md    text eol=lf
+*.js    text eol=lf
+*.css   text eol=lf
+*.html  text eol=lf
+
+# Binary files (no line ending munging)
+*.png   -text
+*.jpg   -text
+*.jpeg  -text
+*.gif   -text
+*.pdf   -text
+*.zip   -text
+*.rds   -text
+*.rda   -text
+*.sqlite -text
+EOF
