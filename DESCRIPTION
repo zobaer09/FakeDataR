@@ -1,6 +1,6 @@
 Package: FakeDataR
 Title: Privacy-Preserving Synthetic Data for LLM Workflows
-Version: 0.1.0
+Version: 0.2.0
 Authors@R:
     person(given = "Zobaer", family = "Ahmed, PhD",
            email = "zunnun09@gmail.com",
