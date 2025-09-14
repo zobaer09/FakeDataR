@@ -33,7 +33,8 @@ llm_bundle(
 
 \item{path}{Folder to write outputs. Default: \code{tempdir()}.}
 
-\item{filename}{Base filename (without extension). Default: "fake_bundle".}
+\item{filename}{Base file name (no extension). Example: "demo_bundle".
+This becomes files like "demo_bundle.csv", "demo_bundle.rds", etc.}
 
 \item{seed}{Optional RNG seed for reproducibility.}
 
@@ -43,7 +44,9 @@ llm_bundle(
 
 \item{prompt_filename}{Name for the README file. Default "README_FOR_LLM.txt".}
 
-\item{zip_filename}{Name for the zip file (no path). Default "\if{html}{\out{<filename>}}.zip".}
+\item{zip_filename}{Optional custom name for the ZIP file (no path).
+If \code{NULL} (default), it is derived as \code{paste0(filename, ".zip")},
+e.g. \code{"demo_bundle.zip"}.}
 
 \item{sensitive}{Character vector of column names to treat as sensitive (optional).}
 
@@ -60,4 +63,9 @@ $zip_path (optional), and $fake (data.frame).
 \description{
 Generates fake data, writes files (CSV/RDS/Parquet), writes a scrubbed JSON schema,
 and optionally writes a README prompt and a single ZIP file containing everything.
+}
+\details{
+\strong{Tips}
+Avoid using angle brackets in examples; prefer plain tokens like \code{NAME}
+or \code{FILE_NAME}. If you truly want bracket glyphs, use unicode ⟨name⟩ ⟩name⟨.
 }

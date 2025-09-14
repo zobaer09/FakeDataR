@@ -2,20 +2,32 @@
 % Please edit documentation in R/sql_schema.R
 \name{schema_from_db}
 \alias{schema_from_db}
-\title{Inspect table (schema-only) -> data.frame schema}
+\title{Extract a table schema from a DB connection}
 \usage{
 schema_from_db(conn, table, level = c("medium", "low", "high"))
 }
 \arguments{
-\item{conn}{DBI connection}
+\item{conn}{A DBI connection.}
 
-\item{table}{table name}
+\item{table}{Character scalar: table name to introspect.}
 
-\item{level}{"low","medium","high"}
+\item{level}{Privacy preset to annotate in schema metadata:
+one of "low", "medium", "high". Default "medium".}
 }
 \value{
-data.frame with columns: name, type, nullable, sensitive
+A data.frame with column metadata (e.g., name, type).
 }
 \description{
-Inspect table (schema-only) -> data.frame schema
+Returns a data frame describing the columns of a database table.
+}
+\examples{
+if (requireNamespace("DBI", quietly = TRUE) &&
+    requireNamespace("RSQLite", quietly = TRUE)) {
+  con <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
+  on.exit(DBI::dbDisconnect(con), add = TRUE)
+  DBI::dbWriteTable(con, "mtcars", mtcars[1:3, ])
+  sc <- schema_from_db(con, "mtcars")
+  head(sc)
+}
+
 }

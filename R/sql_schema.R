@@ -59,12 +59,30 @@
 
 # ---- main -----------------------------------------------------------------
 
-#' Inspect table (schema-only) -> data.frame schema
-#' @param conn DBI connection
-#' @param table table name
-#' @param level "low","medium","high"
-#' @return data.frame with columns: name, type, nullable, sensitive
+#' Extract a table schema from a DB connection
+#'
+#' Returns a data frame describing the columns of a database table.
+#'
+#' @param conn A DBI connection.
+#' @param table Character scalar: table name to introspect.
+#' @param level Privacy preset to annotate in schema metadata:
+#'   one of "low", "medium", "high". Default "medium".
+#'
+#' @return A data.frame with column metadata (e.g., name, type).
+#'
+#' @examples
+#' if (requireNamespace("DBI", quietly = TRUE) &&
+#'     requireNamespace("RSQLite", quietly = TRUE)) {
+#'   con <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
+#'   on.exit(DBI::dbDisconnect(con), add = TRUE)
+#'   DBI::dbWriteTable(con, "mtcars", mtcars[1:3, ])
+#'   sc <- schema_from_db(con, "mtcars")
+#'   head(sc)
+#' }
+#'
 #' @export
+
+
 schema_from_db <- function(conn, table, level = c("medium","low","high")) {
   level <- match.arg(level)
   
@@ -200,10 +218,43 @@ generate_fake_from_schema <- function(sch_df, n = 30, seed = NULL) {
 
 
 
-#' Bundle from DB schema only (no row reads)
-#' @inheritParams schema_from_db
+#' Build an LLM bundle directly from a database table
+#'
+#' Reads just the schema from `table` on `conn`, synthesizes `n` fake rows,
+#' writes a schema JSON, fake dataset(s), and a README prompt, and optionally
+#' zips them into a single archive.
+#'
+#' @param conn A DBI connection.
+#' @param table Character scalar: table name to read.
 #' @inheritParams llm_bundle
+#'
+#' @return Invisibly, a list with useful paths:
+#' \itemize{
+#'   \item \code{schema_path} – schema JSON
+#'   \item \code{files} – vector of written fake-data files
+#'   \item \code{zip_path} – zip archive path (if \code{zip = TRUE})
+#' }
+#'
+#' @examples
+#' \dontrun{
+#' if (requireNamespace("DBI", quietly = TRUE) &&
+#'     requireNamespace("RSQLite", quietly = TRUE)) {
+#'   con <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
+#'   on.exit(DBI::dbDisconnect(con), add = TRUE)
+#'   DBI::dbWriteTable(con, "cars", head(cars, 20), overwrite = TRUE)
+#'   out <- llm_bundle_from_db(
+#'     con, "cars",
+#'     n = 100, level = "medium",
+#'     formats = c("csv","rds"),
+#'     path = tempdir(), filename = "db_bundle",
+#'     seed = 1, write_prompt = TRUE, zip = TRUE
+#'   )
+#' }
+#' }
+#'
 #' @export
+
+
 llm_bundle_from_db <- function(conn, table,
                                n = 30,
                                level = c("medium","low","high"),

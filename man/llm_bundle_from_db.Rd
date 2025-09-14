@@ -2,7 +2,7 @@
 % Please edit documentation in R/sql_schema.R
 \name{llm_bundle_from_db}
 \alias{llm_bundle_from_db}
-\title{Bundle from DB schema only (no row reads)}
+\title{Build an LLM bundle directly from a database table}
 \usage{
 llm_bundle_from_db(
   conn,
@@ -20,19 +20,20 @@ llm_bundle_from_db(
 )
 }
 \arguments{
-\item{conn}{DBI connection}
+\item{conn}{A DBI connection.}
 
-\item{table}{table name}
+\item{table}{Character scalar: table name to read.}
 
 \item{n}{Number of rows in the fake dataset (default 30).}
 
-\item{level}{"low","medium","high"}
+\item{level}{Privacy level: "low", "medium", or "high". Controls stricter defaults.}
 
 \item{formats}{Which data files to write: any of "csv","rds","parquet".}
 
 \item{path}{Folder to write outputs. Default: \code{tempdir()}.}
 
-\item{filename}{Base filename (without extension). Default: "fake_bundle".}
+\item{filename}{Base file name (no extension). Example: "demo_bundle".
+This becomes files like "demo_bundle.csv", "demo_bundle.rds", etc.}
 
 \item{seed}{Optional RNG seed for reproducibility.}
 
@@ -40,10 +41,40 @@ llm_bundle_from_db(
 
 \item{zip}{Create a single zip archive containing data + schema + README? Default FALSE.}
 
-\item{zip_filename}{Name for the zip file (no path). Default "\if{html}{\out{<filename>}}.zip".}
+\item{zip_filename}{Optional custom name for the ZIP file (no path).
+If \code{NULL} (default), it is derived as \code{paste0(filename, ".zip")},
+e.g. \code{"demo_bundle.zip"}.}
 
 \item{sensitive_strategy}{"fake" (replace with realistic fakes) or "drop". Default "fake".}
 }
+\value{
+Invisibly, a list with useful paths:
+\itemize{
+\item \code{schema_path} – schema JSON
+\item \code{files} – vector of written fake-data files
+\item \code{zip_path} – zip archive path (if \code{zip = TRUE})
+}
+}
 \description{
-Bundle from DB schema only (no row reads)
+Reads just the schema from \code{table} on \code{conn}, synthesizes \code{n} fake rows,
+writes a schema JSON, fake dataset(s), and a README prompt, and optionally
+zips them into a single archive.
+}
+\examples{
+\dontrun{
+if (requireNamespace("DBI", quietly = TRUE) &&
+    requireNamespace("RSQLite", quietly = TRUE)) {
+  con <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
+  on.exit(DBI::dbDisconnect(con), add = TRUE)
+  DBI::dbWriteTable(con, "cars", head(cars, 20), overwrite = TRUE)
+  out <- llm_bundle_from_db(
+    con, "cars",
+    n = 100, level = "medium",
+    formats = c("csv","rds"),
+    path = tempdir(), filename = "db_bundle",
+    seed = 1, write_prompt = TRUE, zip = TRUE
+  )
+}
+}
+
 }
