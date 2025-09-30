@@ -61,7 +61,7 @@ writes a schema JSON, fake dataset(s), and a README prompt, and optionally
 zips them into a single archive.
 }
 \examples{
-\dontrun{
+\donttest{
 if (requireNamespace("DBI", quietly = TRUE) &&
     requireNamespace("RSQLite", quietly = TRUE)) {
   con <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")

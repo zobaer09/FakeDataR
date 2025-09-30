@@ -145,26 +145,33 @@ schema_from_db <- function(conn, table, level = c("medium","low","high")) {
 }
 
 #' Generate fake data from a DB schema data.frame
-#' @param sch_df data.frame from schema_from_db()
-#' @param n rows
-#' @param seed optional
+#'
+#' @param sch_df A data.frame returned by [schema_from_db()].
+#' @param n Number of rows to generate.
+#' @param seed Optional integer seed for reproducibility.
+#'
+#' @return A base `data.frame` with `n` rows and one column per schema
+#'   entry. Column classes follow the schema `type` values
+#'   (`integer`, `numeric`, `character`, `logical`, `Date`, `POSIXct`);
+#'   missingness is injected when `nullable` is `TRUE`.
+#'
 #' @export
 generate_fake_from_schema <- function(sch_df, n = 30, seed = NULL) {
-  # Safe RNG handling
+  # handle seeding safely without touching .GlobalEnv
   if (!is.null(seed)) {
-    old <- if (exists(".Random.seed", envir = .GlobalEnv)) 
-      get(".Random.seed", envir = .GlobalEnv) 
-    else NULL
-    on.exit({
-      if (!is.null(old)) assign(".Random.seed", old, envir = .GlobalEnv)
-    }, add = TRUE)
-    set.seed(seed)
+    return(withr::with_seed(
+      seed,
+      generate_fake_from_schema(sch_df, n = n, seed = NULL)
+    ))
   }
+  
   if (!is.data.frame(sch_df)) stop("sch_df must be a data.frame")
-  required <- c("name","type","nullable","sensitive")
+  required <- c("name", "type", "nullable", "sensitive")
   if (!all(required %in% names(sch_df))) {
-    stop("schema missing required columns: ", paste(setdiff(required, names(sch_df)), collapse = ", "))
+    stop("schema missing required columns: ",
+         paste(setdiff(required, names(sch_df)), collapse = ", "))
   }
+  
   # enforce order
   sch_df <- sch_df[, required, drop = FALSE]
   
@@ -177,37 +184,42 @@ generate_fake_from_schema <- function(sch_df, n = 30, seed = NULL) {
     na_prop <- if (nullable) 0.1 else 0
     is_na <- rbinom(n, 1, na_prop) == 1
     
-    v <- switch(tp,
-                "integer" = {
-                  x <- as.integer(sample.int(100000L, n, replace = TRUE))
-                  x[is_na] <- NA_integer_; x
-                },
-                "numeric" = {
-                  x <- runif(n)
-                  x[is_na] <- NA_real_; x
-                },
-                "character" = {
-                  x <- vapply(seq_len(n), function(j) paste0("x", paste(sample(letters, 5, TRUE), collapse="")), character(1))
-                  x[is_na] <- NA_character_; x
-                },
-                "logical" = {
-                  x <- sample(c(TRUE, FALSE), n, replace = TRUE)
-                  x[is_na] <- NA; x
-                },
-                "Date" = {
-                  pool <- seq(Sys.Date() - 365L, Sys.Date(), by = "day")
-                  x <- as.Date(sample(pool, n, replace = TRUE))
-                  x[is_na] <- as.Date(NA); x
-                },
-                "POSIXct" = {
-                  now <- Sys.time()
-                  x <- as.POSIXct(runif(n, as.numeric(now) - 7 * 24 * 3600, as.numeric(now)),
-                                  origin = "1970-01-01", tz = "UTC")
-                  x[is_na] <- as.POSIXct(NA, origin = "1970-01-01", tz = "UTC"); x
-                },
-                {
-                  x <- rep(NA_character_, n); x
-                }
+    v <- switch(
+      tp,
+      "integer" = {
+        x <- as.integer(sample.int(100000L, n, replace = TRUE))
+        x[is_na] <- NA_integer_; x
+      },
+      "numeric" = {
+        x <- runif(n)
+        x[is_na] <- NA_real_; x
+      },
+      "character" = {
+        x <- vapply(seq_len(n), function(j)
+          paste0("x", paste(sample(letters, 5, TRUE), collapse = "")),
+          character(1))
+        x[is_na] <- NA_character_; x
+      },
+      "logical" = {
+        x <- sample(c(TRUE, FALSE), n, replace = TRUE)
+        x[is_na] <- NA; x
+      },
+      "Date" = {
+        pool <- seq(Sys.Date() - 365L, Sys.Date(), by = "day")
+        x <- as.Date(sample(pool, n, replace = TRUE))
+        x[is_na] <- as.Date(NA); x
+      },
+      "POSIXct" = {
+        now <- Sys.time()
+        x <- as.POSIXct(
+          runif(n, as.numeric(now) - 7 * 24 * 3600, as.numeric(now)),
+          origin = "1970-01-01", tz = "UTC"
+        )
+        x[is_na] <- as.POSIXct(NA, origin = "1970-01-01", tz = "UTC"); x
+      },
+      {
+        x <- rep(NA_character_, n); x
+      }
     )
     
     out[[i]] <- v
@@ -236,7 +248,7 @@ generate_fake_from_schema <- function(sch_df, n = 30, seed = NULL) {
 #' }
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' if (requireNamespace("DBI", quietly = TRUE) &&
 #'     requireNamespace("RSQLite", quietly = TRUE)) {
 #'   con <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
@@ -253,6 +265,7 @@ generate_fake_from_schema <- function(sch_df, n = 30, seed = NULL) {
 #' }
 #'
 #' @export
+
 
 
 llm_bundle_from_db <- function(conn, table,

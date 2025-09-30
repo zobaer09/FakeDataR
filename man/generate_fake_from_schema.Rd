@@ -7,11 +7,17 @@
 generate_fake_from_schema(sch_df, n = 30, seed = NULL)
 }
 \arguments{
-\item{sch_df}{data.frame from schema_from_db()}
+\item{sch_df}{A data.frame returned by \code{\link[=schema_from_db]{schema_from_db()}}.}
 
-\item{n}{rows}
+\item{n}{Number of rows to generate.}
 
-\item{seed}{optional}
+\item{seed}{Optional integer seed for reproducibility.}
+}
+\value{
+A base \code{data.frame} with \code{n} rows and one column per schema
+entry. Column classes follow the schema \code{type} values
+(\code{integer}, \code{numeric}, \code{character}, \code{logical}, \code{Date}, \code{POSIXct});
+missingness is injected when \code{nullable} is \code{TRUE}.
 }
 \description{
 Generate fake data from a DB schema data.frame
