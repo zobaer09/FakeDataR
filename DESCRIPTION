@@ -1,11 +1,11 @@
 Package: FakeDataR
 Title: Privacy-Preserving Synthetic Data for 'LLM' Workflows
-Version: 0.2.1
+Version: 0.2.2
 Authors@R:
-    person(given = "Zobaer", family = "Ahmed, PhD",
+    person(given = "Zobaer", family = "Ahmed",
            email = "zunnun09@gmail.com",
            role = c("aut","cre"))
-Description: Generate privacy-preserving synthetic datasets that mirror structure, types, factor levels, and missingness; export bundles for 'LLM' workflows (data plus JSON schema and guidance); and build fake data directly from 'SQL' database tables without reading real rows. Methods are related to approaches in Nowok, Raab and Dibben (2016) <doi:10.32614/RJ-2016-019> and the foundation-model overview by Bommasani et al. (2021) <doi:10.48550/arXiv.2108.07258>.
+Description: Generate privacy-preserving synthetic datasets that mirror structure, types, factor levels, and missingness; export bundles for 'LLM' workflows (data plus 'JSON' schema and guidance); and build fake data directly from 'SQL' database tables without reading real rows. Methods are related to approaches in Nowok, Raab and Dibben (2016) <doi:10.32614/RJ-2016-019> and the foundation-model overview by Bommasani et al. (2021) <doi:10.48550/arXiv.2108.07258>.
 License: MIT + file LICENSE
 URL: https://zobaer09.github.io/FakeDataR/, https://github.com/zobaer09/FakeDataR
 BugReports: https://github.com/zobaer09/FakeDataR/issues

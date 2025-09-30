@@ -1,15 +1,6 @@
-## Test environments
-- Local Windows (R 4.3.x): R CMD check --as-cran: 0 errors | 0 warnings | 0 notes (or list notes, if any)
-- GitHub Actions: ubuntu-latest, macos-latest (Intel & arm64), windows-latest: passing
-- R-hub: linux, macOS (Intel/arm64), Windows: passing
-- win-builder: R-release & R-devel: passing
+## Resubmission (FakeDataR 0.2.2)
 
-## Notes
-- First CRAN submission for package name “FakeDataR”.
-- Examples and vignettes are fast; no network or long-running code.
-- No non-CRAN dependencies required to build vignettes.
-
-## Downstream dependencies
-- None.
-
+- DESCRIPTION: replaced arXiv URL with the arXiv DOI (doi:10.48550/arXiv.2108.07258).
+- Quoted software/API names in single quotes; expanded the acronym in the Title.
+- R CMD check locally: 0 ERRORs, 0 WARNINGs; only the 'new submission' NOTE.
 
