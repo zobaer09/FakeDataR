@@ -1,29 +1,19 @@
-# Normalize text to LF in the repo
 * text=auto eol=lf
-
-# Keep Windows command scripts CRLF
-*.bat eol=crlf
-*.cmd eol=crlf
-
-# Force LF for sources and docs
-*.R     text eol=lf
-*.Rmd   text eol=lf
-*.Rd    text eol=lf
-*.yml   text eol=lf
-*.yaml  text eol=lf
-*.md    text eol=lf
-*.js    text eol=lf
-*.css   text eol=lf
-*.html  text eol=lf
-
-# Binary files (no line-ending munging)
-*.png    -text
-*.jpg    -text
-*.jpeg   -text
-*.gif    -text
-*.pdf    -text
-*.zip    -text
-*.rds    -text
-*.rda    -text
+*.R text eol=lf
+*.Rmd text eol=lf
+*.Rd text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.md text eol=lf
+*.js text eol=lf
+*.css text eol=lf
+*.html text eol=lf
+*.png -text
+*.jpg -text
+*.jpeg -text
+*.gif -text
+*.pdf -text
+*.zip -text
+*.rds -text
+*.rda -text
 *.sqlite -text
-
