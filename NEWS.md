@@ -1,4 +1,5 @@
-# FakeDataR 0.2.0
-- First CRAN release.
-- Synthetic data generator with privacy presets and schema-only DB workflow.
-- New: sensitive-field detection & masking; pkgdown site & vignettes.
+# FakeDataR 0.2.1
+
+- CRAN fixes: expanded acronym, quoted software names, added references.
+- Replaced \dontrun with \donttest in examples.
+- Added \value docs; RNG now uses withr::with_seed() to avoid .GlobalEnv writes.
