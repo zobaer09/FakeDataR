@@ -1,14 +1,30 @@
 template:
   bootstrap: 5
+  bslib:
+    primary: "#111827"
+    navbar-bg: "#ffffff"
+    navbar-fg: "#111827"
 
 navbar:
   structure:
-    left:  [reference, articles]
+    left:  [reference, articles, news]
     right: [search, github]
   components:
     github:
       icon: fab fa-github
       href: https://github.com/zobaer09/FakeDataR
+
+home:
+  title: FakeDataR
+  sidebar:
+    structure: [links, license, community]
+  links:
+    - text: GitHub
+      href: https://github.com/zobaer09/FakeDataR
+    - text: CRAN
+      href: https://CRAN.R-project.org/package=FakeDataR
+    - text: Bug reports
+      href: https://github.com/zobaer09/FakeDataR/issues
 
 reference:
   - title: Generate
@@ -33,5 +49,5 @@ reference:
 
 development:
   mode: auto
-  
+
 url: https://zobaer09.github.io/FakeDataR

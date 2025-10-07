@@ -28,3 +28,6 @@ package_inventory_new.csv
 .idea/
 pkgdown/    # build cache (not the /docs site)
 docs/
+pkgdown/
+CRAN-SUBMISSION
+logo/*.psd
