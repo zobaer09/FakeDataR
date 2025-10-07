@@ -15,9 +15,25 @@ knitr::opts_chunk$set(
 
 # FakeDataR
 
+<p align="right"><img src="man/figures/logo.png" alt="FakeDataR logo" width="140"></p>
+
 <!-- badges: start -->
+
+<!-- CRAN status -->
+[![CRAN status](https://www.r-pkg.org/badges/version/FakeDataR)](https://CRAN.R-project.org/package=FakeDataR)
+[![CRAN checks](https://badges.cranchecks.info/worst/FakeDataR.svg)](https://cran.r-project.org/web/checks/check_results_FakeDataR.html)
+
+<!-- Downloads -->
+[![CRAN downloads](https://cranlogs.r-pkg.org/badges/grand-total/FakeDataR?color=brightgreen)](https://cran.r-project.org/package=FakeDataR)
+
+<!-- CI -->
 [![R-CMD-check](https://github.com/zobaer09/FakeDataR/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/zobaer09/FakeDataR/actions/workflows/R-CMD-check.yaml)
-[📘 Website](https://zobaer09.github.io/FakeDataR/) • [Articles](https://zobaer09.github.io/FakeDataR/articles/) • [Reference](https://zobaer09.github.io/FakeDataR/reference/)
+[![pkgdown](https://github.com/zobaer09/FakeDataR/actions/workflows/pkgdown.yaml/badge.svg)](https://github.com/zobaer09/FakeDataR/actions/workflows/pkgdown.yaml)
+
+<!-- Site -->
+[![Website](https://img.shields.io/badge/docs-pkgdown-blue)](https://zobaer09.github.io/FakeDataR/)
+
+
 <!-- badges: end -->
 
 **FakeDataR** makes safe, synthetic stand‑ins for real datasets.  
