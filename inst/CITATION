@@ -1,11 +1,19 @@
+# inst/CITATION
+
+meta  <- utils::packageDescription("FakeDataR")
+ver   <- meta[["Version"]]
+year  <- if (!is.null(meta[["Date/Publication"]]))
+  substr(meta[["Date/Publication"]], 1, 4) else format(Sys.Date(), "%Y")
+
+citHeader("To cite the FakeDataR R package in publications use:")
+
 bibentry(
-  bibtype  = "Article",
-  title    = ,
-  author   = ,
-  journal  = ,
-  year     = ,
-  volume   = ,
-  number   = ,
-  pages    = ,
-  doi      =
+  bibtype = "Manual",
+  title   = "FakeDataR: Privacy-Preserving Synthetic Data for LLM Workflows",
+  author  = c(
+    person(given = "Zobaer", family = "Ahmed")
+  ),
+  year    = year,
+  note    = sprintf("R package version %s", ver),
+  url     = "https://CRAN.R-project.org/package=FakeDataR"
 )
