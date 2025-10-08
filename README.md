@@ -1,49 +1,67 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
+<p align="right">
+
+<img src="man/figures/logo.png" alt="FakeDataR logo" width="140">
+</p>
+
 # FakeDataR
 
-<p align="right"><img src="man/figures/logo.png" alt="FakeDataR logo" width="140"></p>
-
-[![CRAN status](https://www.r-pkg.org/badges/version/FakeDataR)](https://CRAN.R-project.org/package=FakeDataR)
-[![CRAN downloads](https://cranlogs.r-pkg.org/badges/grand-total/FakeDataR?color=brightgreen)](https://cran.r-project.org/package=FakeDataR)
+[![CRAN
+status](https://www.r-pkg.org/badges/version/FakeDataR)](https://CRAN.R-project.org/package=FakeDataR)
+[![CRAN
+downloads](https://cranlogs.r-pkg.org/badges/grand-total/FakeDataR?color=brightgreen)](https://cran.r-project.org/package=FakeDataR)
 [![R-CMD-check](https://github.com/zobaer09/FakeDataR/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/zobaer09/FakeDataR/actions/workflows/R-CMD-check.yaml)
 [![pkgdown](https://github.com/zobaer09/FakeDataR/actions/workflows/pkgdown.yaml/badge.svg)](https://github.com/zobaer09/FakeDataR/actions/workflows/pkgdown.yaml)
 [![Website](https://img.shields.io/badge/docs-pkgdown-blue)](https://zobaer09.github.io/FakeDataR/)
 
 ## Why FakeDataR?
 
-- **Problem:** Many users can’t run large models locally. To get help from an LLM or share examples, they hand-edit real datasets—slow, brittle, and risky for privacy.
-- **Solution:** **FakeDataR** runs entirely on your machine (R only). It reads your real data locally and generates a **synthetic copy** that mirrors structure (schema, types, factor levels, ranges, missingness). Sensitive fields can be masked or dropped. You can safely upload the **synthetic** dataset to an LLM or share with collaborators—without exposing the original data.
+- **Problem:** Many users can’t run large models locally. To get help
+  from an LLM or share examples, they hand-edit real datasets, slow,
+  brittle, and risky for privacy.
+- **Solution:** **FakeDataR** runs entirely on your machine (R only). It
+  reads your real data locally and generates a **synthetic copy** that
+  mirrors structure (schema, types, factor levels, ranges, missingness).
+  Sensitive fields can be masked or dropped. You can safely upload the
+  **synthetic** dataset to an LLM or share with collaborators, without
+  exposing the original data.
 
 ## What makes it different?
 
-- **Local by default:** No cloud round-trips; your real data stays on your machine.
-- **Schema-faithful:** Preserves column types, factor levels, NA patterns, and numeric ranges.
-- **Privacy controls:** Heuristics for sensitive fields (e.g., IDs, emails, phones) with strategies (`fake`, `drop`).
-- **LLM bundles:** Exports fake data + JSON schema + README prompt in one bundle.
-- **DB schema support:** Build synthetic data from a database **schema** without pulling real rows.
+- **Local by default:** No cloud round-trips; your real data stays on
+  your machine.
+- **Schema-faithful:** Preserves column types, factor levels, NA
+  patterns, and numeric ranges.
+- **Privacy controls:** Heuristics for sensitive fields (e.g., IDs,
+  emails, phones) with strategies (`fake`, `drop`).
+- **LLM bundles:** Exports fake data + JSON schema + README prompt in
+  one bundle.
+- **DB schema support:** Build synthetic data from a database **schema**
+  without pulling real rows.
 
-> Related work exists (e.g., general fake-data generators, schema tools). FakeDataR focuses on **privacy-preserving, schema-faithful** synthesis aimed at LLM workflows and reproducible sharing.
+> Related work exists (e.g., general fake-data generators, schema
+> tools). FakeDataR focuses on **privacy-preserving, schema-faithful**
+> synthesis aimed at LLM workflows and reproducible sharing.
 
 ## Install
 
-```{r}
-
+``` r
 install.packages("FakeDataR")  # CRAN
-
+#> Installing package into 'C:/Users/Zobaer Ahmed/AppData/Local/Temp/RtmpeemZPG/temp_libpath28646217215b'
+#> (as 'lib' is unspecified)
+#> installing the source package 'FakeDataR'
 # devtools::install_github("zobaer09/FakeDataR")  # development (optional)
-
 ```
 
 ## Quick start
 
-```{r}
-
+``` r
 library(FakeDataR)
 
-# 1) Read your data locally (never leaves your machine)
-df <- read.csv("path/to/your.csv", check.names = FALSE)
+# 1) Start from a built-in data frame for reproducibility
+df <- head(mtcars, 50)
 
 # 2) Generate a synthetic copy
 fake <- generate_fake_data(
@@ -71,20 +89,24 @@ bundle <- llm_bundle(
 )
 
 bundle$zip_path
-
+#> [1] "C:\\Users\\ZOBAER~1\\AppData\\Local\\Temp\\Rtmp2T0LsH/demo_bundle.zip"
 ```
 
 ## When to use / not use
 
 **Use when:**
 
-- You need an LLM or collaborator to reproduce your data shape but not see the real values.
-- You want quick, documented synthetic data for demos, tutorials, bug reports, or tests.
+- You need an LLM or collaborator to reproduce your data shape but not
+  see the real values.
+- You want quick, documented synthetic data for demos, tutorials, bug
+  reports, or tests.
 
 **Avoid when:**
 
-- You need formal differential privacy guarantees (FakeDataR focuses on pragmatic masking and synthesis).
-- You need exact statistical fidelity for modeling benchmarks. It is not a drop-in replacement for originals.
+- You need formal differential privacy guarantees (FakeDataR focuses on
+  pragmatic masking and synthesis).
+- You need exact statistical fidelity for modeling benchmarks. It is not
+  a drop-in replacement for originals.
 
 ## Documentation
 

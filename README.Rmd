@@ -12,10 +12,9 @@ knitr::opts_chunk$set(
   out.width = "100%"
 )
 ```
+<p align="right"><img src="man/figures/logo.png" alt="FakeDataR logo" width="140"></p>
 
 # FakeDataR
-
-<p align="right"><img src="man/figures/logo.png" alt="FakeDataR logo" width="140"></p>
 
 [![CRAN status](https://www.r-pkg.org/badges/version/FakeDataR)](https://CRAN.R-project.org/package=FakeDataR)
 [![CRAN downloads](https://cranlogs.r-pkg.org/badges/grand-total/FakeDataR?color=brightgreen)](https://cran.r-project.org/package=FakeDataR)
@@ -25,8 +24,8 @@ knitr::opts_chunk$set(
 
 ## Why FakeDataR?
 
-- **Problem:** Many users can’t run large models locally. To get help from an LLM or share examples, they hand-edit real datasets—slow, brittle, and risky for privacy.
-- **Solution:** **FakeDataR** runs entirely on your machine (R only). It reads your real data locally and generates a **synthetic copy** that mirrors structure (schema, types, factor levels, ranges, missingness). Sensitive fields can be masked or dropped. You can safely upload the **synthetic** dataset to an LLM or share with collaborators—without exposing the original data.
+- **Problem:** Many users can’t run large models locally. To get help from an LLM or share examples, they hand-edit real datasets, slow, brittle, and risky for privacy.
+- **Solution:** **FakeDataR** runs entirely on your machine (R only). It reads your real data locally and generates a **synthetic copy** that mirrors structure (schema, types, factor levels, ranges, missingness). Sensitive fields can be masked or dropped. You can safely upload the **synthetic** dataset to an LLM or share with collaborators, without exposing the original data.
 
 ## What makes it different?
 
@@ -41,21 +40,17 @@ knitr::opts_chunk$set(
 ## Install
 
 ```{r}
-
 install.packages("FakeDataR")  # CRAN
-
 # devtools::install_github("zobaer09/FakeDataR")  # development (optional)
-
 ```
 
 ## Quick start
 
 ```{r}
-
 library(FakeDataR)
 
-# 1) Read your data locally (never leaves your machine)
-df <- read.csv("path/to/your.csv", check.names = FALSE)
+# 1) Start from a built-in data frame for reproducibility
+df <- head(mtcars, 50)
 
 # 2) Generate a synthetic copy
 fake <- generate_fake_data(
@@ -106,5 +101,6 @@ bundle$zip_path
 ## Citation
 
 If you use FakeDataR in your work, please cite the CRAN page.
+
 
 
