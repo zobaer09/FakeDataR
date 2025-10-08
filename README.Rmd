@@ -13,9 +13,12 @@ knitr::opts_chunk$set(
 )
 ```
 
+```{r}
+
 if (!requireNamespace("pkgdown", quietly = TRUE) || !pkgdown::in_pkgdown()) {
   cat('<p align="right"><img src="man/figures/logo.png" alt="FakeDataR logo" width="140"></p>')
 }
+```
 
 # FakeDataR
 
