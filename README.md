@@ -1,14 +1,6 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-``` r
-
-if (!requireNamespace("pkgdown", quietly = TRUE) || !pkgdown::in_pkgdown()) {
-  cat('<p align="right"><img src="man/figures/logo.png" alt="FakeDataR logo" width="140"></p>')
-}
-#> <p align="right"><img src="man/figures/logo.png" alt="FakeDataR logo" width="140"></p>
-```
-
 # FakeDataR
 
 [![CRAN
@@ -52,7 +44,7 @@ downloads](https://cranlogs.r-pkg.org/badges/grand-total/FakeDataR?color=brightg
 
 ``` r
 install.packages("FakeDataR")  # CRAN
-#> Installing package into 'C:/Users/Zobaer Ahmed/AppData/Local/Temp/RtmpeemZPG/temp_libpath2864370b28d3'
+#> Installing package into 'C:/Users/Zobaer Ahmed/AppData/Local/Temp/RtmpeemZPG/temp_libpath2864498820af'
 #> (as 'lib' is unspecified)
 #> installing the source package 'FakeDataR'
 # devtools::install_github("zobaer09/FakeDataR")  # development (optional)
@@ -92,7 +84,7 @@ bundle <- llm_bundle(
 )
 
 bundle$zip_path
-#> [1] "C:\\Users\\ZOBAER~1\\AppData\\Local\\Temp\\RtmpughfDB/demo_bundle.zip"
+#> [1] "C:\\Users\\ZOBAER~1\\AppData\\Local\\Temp\\Rtmpc34k7g/demo_bundle.zip"
 ```
 
 ## When to use / not use
